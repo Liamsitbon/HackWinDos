@@ -24,8 +24,11 @@ Buffers and output views must be disjoint as documented in the header.
 helper-coprocessor startup, GPIO resets and Windows HID enumeration remain absent.
 No input device, IRQ, DART mapping or physical register was exercised.
 
-These C files compile into Windows ARM64 COFF objects; no KMDF `.sys` or runtime
-hardware support is claimed. See [RTKit adapter ownership](../apple-rtkit/README.md)
+The portable cores and the KMDF wrapper now build into an ARM64 native
+`AppleDockChannel.sys` with the official WDK. [Build 42041739601](https://github.com/Liamsitbon/HackWinDos/actions/runs/42041739601)
+produced SYS/INF/CAT artifacts from source `178670b624e05a5e1d8b2f7e332b47537fa1f93e`.
+The 35848-byte SYS SHA256 is `8c71e11349967c6162277f71eb4f90732407572f0956efe04aa0f3a122bbec33`.
+Catalog trust and runtime hardware support remain unqualified. See [RTKit adapter ownership](../apple-rtkit/README.md)
 and [kext evidence](../../documentation/reverse-engineering/DOCKCHANNEL.md).
 
 ## Interface discovery
@@ -41,7 +44,8 @@ as in upstream. No buffer is allocated and no GPIO is driven.
 
 Discovery can span multiple events (`more_packets`); accumulating descriptors
 and atomically publishing an interface remain adapter responsibilities. These
-cores are not yet connected to m1n1, Mu or a Windows KMDF device. Consequently
+cores still lack the complete MTP/helper/DART/GPIO/IRQ resource adapter and
+discovery-driven HID publication in the Windows wrapper. Consequently
 they do not make built-in input usable at Windows Boot Manager Recovery.
 
 `tests/test_dockchannel_discovery.py` exercises every two-part frame split,

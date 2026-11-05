@@ -1,0 +1,53 @@
+{
+  "platform": "j413",
+  "architecture": "ARM64",
+  "runtime_qualified": false,
+  "packages": {
+    "AppleDockChannel": {
+      "source": "drivers/apple-dockchannel/windows",
+      "hardware_id": "ACPI\\APPL0008",
+      "missing_files": [],
+      "problems": [],
+      "complete_binary_package": true,
+      "runtime_qualified": false,
+      "limitation": "MTP firmware, DART, IRQ and HID report adapter need qualification",
+      "sha256": {
+        "AppleDockChannel.inf": "56ce71bdfeba67d9800275d124dad9ee6e13903d6e1b938cf6860c3702bae394",
+        "AppleDockChannel.sys": "8c71e11349967c6162277f71eb4f90732407572f0956efe04aa0f3a122bbec33",
+        "AppleDockChannel.cat": "2cdc73b7637b6a98bb1c1b486dd7805f07f5126262b9b135840d7ba8c4d13924"
+      }
+    },
+    "AppleAgx": {
+      "source": "drivers/apple-agx/windows",
+      "hardware_id": "ACPI\\APPL0002",
+      "missing_files": [
+        "AppleAgx.inf",
+        "AppleAgx.sys",
+        "AppleAgx.cat"
+      ],
+      "problems": [],
+      "complete_binary_package": false,
+      "runtime_qualified": false,
+      "limitation": "J413 runtime resource/firmware/broker contract differs from the J313 implementation",
+      "sha256": {}
+    }
+  },
+  "missing_native_implementations": {
+    "internal_audio": "No Windows audio driver implementation in this checkout",
+    "wifi": "No Windows Wi-Fi driver implementation in this checkout",
+    "bluetooth": "No Windows Bluetooth transport driver implementation in this checkout",
+    "battery_and_power": "No completed J413 Windows ACPI/PEP runtime implementation",
+    "camera": "No Windows ISP/camera driver implementation in this checkout",
+    "external_display": "No completed Windows DCP/external-display runtime driver"
+  },
+  "inbox_owners": {
+    "usb": "USBXHCI/USBHUB3/USBSTOR/HIDUSB after valid platform handoff",
+    "storage": "STORNVME/DISK over the emulated NVMe contract",
+    "basic_display": "Firmware GOP/basic display; no acceleration proof"
+  },
+  "excluded": {
+    "AppleInput": "J313 SPI input is not the J413 DockChannel transport"
+  },
+  "all_requested_drivers_complete": false,
+  "qualification": "Binary/header audit only; catalog trust and hardware operation are not verified"
+}

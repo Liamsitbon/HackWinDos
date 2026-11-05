@@ -1,6 +1,8 @@
 # J413 direct Windows Setup
 
-This is an experimental software build and a prepared local installer volume.
+A fresh internal `HackWinDos UEFI` host environment now exists with a 2.5GB
+APFS stub and a 9.5GB FAT ESP. The candidate is bound to that real ESP.
+Apple Recovery enrollment and the first physical Windows launch remain pending.
 **Native M2 Windows boot, accelerated graphics and built-in input remain
 unqualified.** The last physical trial did not enumerate usable USB storage.
 No newer physical boot or Windows Setup screen has been observed.
@@ -36,10 +38,11 @@ ARM64. Copied file hashes, WIM verification and split-part hashes are recorded.
 Automatic unattended installation files and the old unqualified `Drivers`
 directory are omitted.
 
-The current development artifact uses a new 12GiB local sparse image, not the
-2GB physical `M2BOOT` partition. That partition is too small for the full source.
-The image is not directly selectable in Apple's startup picker. It is not an
-enrolled internal Asahi/UEFI environment.
+The internal ESP PARTUUID is `6E5BC1A2-9871-4E5A-8E60-BF68C8E785BB`.
+The earlier generated 12GiB image is preserved on the external USB under
+`HackWinDos-Staging`; its old local path is a symlink. The 2GB physical
+`M2BOOT` volume is too small for the full source and is not the new direct target.
+See [provisioning](J413_PROVISIONING.md) and [Recovery handoff](J413_RECOVERY_HE.md).
 
 ## Explicit target and build
 
@@ -53,7 +56,7 @@ scripts/build-j413-boot-experiment.sh
 
 The generated target header is included in the source digest, and the firmware
 manifest records `direct_setup.partition_uuid`. The development header currently
-names only the local staging image. Rebinding a different internal volume
+names the measured internal ESP. Rebinding a different internal volume
 requires a rebuild; copying its files alone does not change the target identity.
 
 ## Prepare an existing volume
@@ -94,10 +97,9 @@ sudo /usr/bin/python3 scripts/install-j413-direct-setup.py \
 ```
 
 The target must already exist, be an internal FAT ESP and match the rebuilt
-firmware. The old Asahi/UEFI installation has been deleted on the current host;
-no replacement was installed by this work. The standard small ESP also cannot
-hold this complete installer. A suitably sized environment is a separate
-deployment step. These commands are not evidence of a successful native boot.
+firmware. The old Asahi/UEFI environment was deleted and has now been replaced by the
+recorded 2.5GB stub plus 9.5GB ESP. The official host installation completed;
+Recovery enrollment and native Windows operation remain separate checkpoints.
 
 ## Driver state
 
@@ -106,7 +108,7 @@ deployment step. These commands are not evidence of a successful native boot.
 | Basic display | Firmware GOP/basic Windows display; no M2 acceleration proof |
 | USB and external input | Windows inbox USBXHCI/USBHUB3/USBSTOR/HIDUSB after valid platform DMA/IRQ/handoff; native runtime not tested |
 | Internal storage | m1n1 synthetic NVMe plus inbox Windows storage; new M2 native run required |
-| Built-in keyboard/trackpad | Portable DockChannel cores and incomplete KMDF adapter; MTP helper firmware, DART, IRQ/resource ownership and real HID translation remain |
+| Built-in keyboard/trackpad | Linked ARM64 KMDF SYS/INF/CAT produced by Windows WDK CI; incomplete transport adapter; MTP helper firmware, DART, IRQ/resource ownership and real HID translation remain |
 | Accelerated graphics | Existing AGX work targets J313 contracts; J413 resources/firmware/broker contract not completed |
 | Audio, Wi-Fi, Bluetooth, camera | No complete Windows implementations in this checkout |
 | Battery, power, external display | No completed J413 Windows runtime implementation |

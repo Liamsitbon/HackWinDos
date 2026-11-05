@@ -17,9 +17,9 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.verify_install_image import verify
 
-ESP_UUID = '9E7B3C33-1721-4EBF-8C9C-A5D4A798B224'
+ESP_UUID = '6E5BC1A2-9871-4E5A-8E60-BF68C8E785BB'
 IMAGE = ROOT / 'dist/j413/boot-experiment/boot.bin'
-IMAGE_SHA256 = '42fe5acbd493cd66e765a64df91f5b49b62042512748242b1276643de58203e8'
+IMAGE_SHA256 = 'e3919fd288efc0cb0577274a2b9bec0c7b553691c6a760ec1f7ef1be725404e6'
 LEDGER = ROOT / 'investigation/EXPERIMENTS.md'
 BACKUPS = ROOT / '.local/direct-setup-installs'
 SETUP_SOURCE = None

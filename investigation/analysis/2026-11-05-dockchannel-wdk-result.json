@@ -1,0 +1,28 @@
+{
+  "workflow_run": 42041739601,
+  "workflow_job": 127294005231,
+  "workflow_url": "https://github.com/Liamsitbon/HackWinDos/actions/runs/42041739601",
+  "source_commit": "178670b624e05a5e1d8b2f7e332b47537fa1f93e",
+  "artifact_id": 13423445308,
+  "archive_sha256": "a125be429eeea0820f69f70d60720d0c62c060fe0154a427b6aca98ec3d41a20",
+  "architecture": "ARM64",
+  "configuration": "Debug",
+  "wdk": "10.0.28000.2526",
+  "linked_sys": true,
+  "runtime_qualified": false,
+  "catalog_trust_verified": false,
+  "files": {
+    "AppleDockChannel.sys": {
+      "size": 35848,
+      "sha256": "8c71e11349967c6162277f71eb4f90732407572f0956efe04aa0f3a122bbec33"
+    },
+    "AppleDockChannel.inf": {
+      "size": 1494,
+      "sha256": "56ce71bdfeba67d9800275d124dad9ee6e13903d6e1b938cf6860c3702bae394"
+    },
+    "AppleDockChannel.cat": {
+      "size": 2666,
+      "sha256": "2cdc73b7637b6a98bb1c1b486dd7805f07f5126262b9b135840d7ba8c4d13924"
+    }
+  }
+}

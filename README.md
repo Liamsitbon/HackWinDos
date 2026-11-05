@@ -11,6 +11,7 @@ its ARM64 `\EFI\BOOT\BOOTAA64.EFI`. A complete FAT32 bundle can hold the bootstr
 boot files and split installation images on that same volume. See the
 [J413 direct Setup guide](documentation/J413_DIRECT_SETUP.md) for the prepared scripts
 Aurora Silicon integration and source/license review: [USB DART admission](documentation/AURORA_INTEGRATION.md).
+Internal environment provisioning: [J413 host install](documentation/J413_PROVISIONING.md); [Recovery instructions](documentation/J413_RECOVERY_HE.md).
 and exact limits. Custom M2 graphics/input drivers remain unqualified; audio, Wi-Fi,
 Bluetooth and camera drivers are not completed in this checkout.
 

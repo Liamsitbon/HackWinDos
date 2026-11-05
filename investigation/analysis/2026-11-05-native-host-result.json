@@ -1,0 +1,70 @@
+{
+  "observed_utc": "2026-11-05T18:29:57.519125+00:00",
+  "platform": "j413",
+  "host_environment": "HackWinDos UEFI",
+  "stub_size_bytes": 2499805184,
+  "esp_uuid": "6E5BC1A2-9871-4E5A-8E60-BF68C8E785BB",
+  "esp_size": "9.5GB",
+  "stub_vgid": "AE5F5B61-DBF4-4107-8A92-14F9255DDBA2",
+  "firmware_sha256": "e3919fd288efc0cb0577274a2b9bec0c7b553691c6a760ec1f7ef1be725404e6",
+  "fd_sha256": "8d6066b1f1346bb7257700dbcd121200a77065de84ab1f6ce99573c4a31bad61",
+  "profile": "debug",
+  "display": "physical",
+  "debug": "off",
+  "direct_setup": {
+    "loader_path": "\\EFI\\BOOT\\BOOTAA64.EFI",
+    "mode": "single-gpt-volume",
+    "partition_uuid": "6E5BC1A2-9871-4E5A-8E60-BF68C8E785BB"
+  },
+  "media_file_count": 965,
+  "images": {
+    "boot.wim": [
+      {
+        "index": "1",
+        "name": "Microsoft Windows PE (arm64)",
+        "architecture": "ARM64"
+      },
+      {
+        "index": "2",
+        "name": "Microsoft Windows Setup (arm64)",
+        "architecture": "ARM64"
+      }
+    ],
+    "install.wim": [
+      {
+        "index": "1",
+        "name": "Windows 11 Home",
+        "architecture": "ARM64"
+      },
+      {
+        "index": "2",
+        "name": "Windows 11 Home Single Language",
+        "architecture": "ARM64"
+      },
+      {
+        "index": "3",
+        "name": "Windows 11 Pro",
+        "architecture": "ARM64"
+      }
+    ]
+  },
+  "split_install_images": {
+    "install.swm": {
+      "size": 3981883451,
+      "sha256": "e00129b23b840d82f6eb4dd1b2a5e17cfe4a93967a56c5434856e71bc2dc3f83"
+    },
+    "install2.swm": {
+      "size": 3604356140,
+      "sha256": "60899e1a996fe2632a43e627a935bde915a69b104a84b356e0289985db6dd6b3"
+    }
+  },
+  "media_manifest_sha256": "53e784d0582d9d5ad17c38f7977fa1bc64499e624c4f510cec8af25bdceb1630",
+  "official_bootstrap_backup_sha256": "f4ce681bdb07cc897eb997a37858712b1ffc48ae1b4770e4d05b982ecffb1f23",
+  "installation_experiment": "EXP-20261105T181629Z-J413-ESP-3147fefc",
+  "native_target_build_experiment": "EXP-20261105T175459Z-J413-NATIVE-TARGET",
+  "recovery_enrollment_complete": false,
+  "windows_boot_observed": false,
+  "all_drivers_complete": false,
+  "macos_free_bytes_after_build": 27542269952,
+  "qualification": "Host files installed and byte/WIM identities verified; operator Recovery enrollment and first native Windows trial remain pending"
+}
