@@ -14,7 +14,7 @@ index ad72599..e0d1fc3 100644
    DEBUG(
        (EFI_D_INFO,
 diff --git a/Silicon/Apple/AppleSiliconPkg/Drivers/WindowsAutoBootDxe/WindowsAutoBootDxe.c b/Silicon/Apple/AppleSiliconPkg/Drivers/WindowsAutoBootDxe/WindowsAutoBootDxe.c
-index 3e117b1..65bbdac 100644
+index 3e117b1..87efab8 100644
 --- a/Silicon/Apple/AppleSiliconPkg/Drivers/WindowsAutoBootDxe/WindowsAutoBootDxe.c
 +++ b/Silicon/Apple/AppleSiliconPkg/Drivers/WindowsAutoBootDxe/WindowsAutoBootDxe.c
 @@ -1,10 +1,11 @@
@@ -39,7 +39,6 @@ index 3e117b1..65bbdac 100644
 +#include <Protocol/J413UsbDartReady.h>
 +#include "J413EfiLog.h"
 +#include <Library/UefiBootManagerLib.h>
-+#include "J413ConnectTrace.h"
 +#include "J413UsbInventory.h"
 +#endif
 +
@@ -52,6 +51,7 @@ index 3e117b1..65bbdac 100644
 +#include "J413EfiCandidates.h"
 +#include "J413DirectSetupTarget.h"
 +#include "J413DirectSetup.h"
++#include "J413ConnectTrace.h"
 +STATIC EFI_STATUS J413NextDirectSetupOption(EFI_BOOT_MANAGER_LOAD_OPTION *Option)
 +{
 +  return J413DirectSetupOption(Option, &mJ413DirectSetupGuid);
@@ -165,7 +165,7 @@ index 3e117b1..65bbdac 100644
 +  // Called by BDS at TPL_APPLICATION, never from a notification callback.
 +  J413LogStatus("J413 EFI phase log; not complete UART/kernel log", EFI_SUCCESS);
 +  if (gST->ConOut != NULL) Print(L"UEFI TRACE: Setup selector entered; connecting controllers\r\n");
-+  Status = J413ConnectBootNvme();
++  Status = J413ConnectBootNvme(&mJ413DirectSetupGuid);
 +  J413LogStatus("NVMe boot connection result", Status);
 +  Status = J413ConnectBootUsb();
 +  if (gST->ConOut != NULL) Print(L"UEFI TRACE: controller connection returned\r\n");

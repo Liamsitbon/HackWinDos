@@ -2,18 +2,39 @@
 
 A fresh internal `HackWinDos UEFI` host environment now exists with a 2.5GB
 APFS stub and a 9.5GB FAT ESP. The candidate is bound to that real ESP.
-Apple Recovery enrollment and the first physical Windows launch remain pending.
+EXP-20261105-J413-052 reached native Mu/BDS, then hung during recursive PCI-root
+connection for several hours (IMG_6327). The Windows loader was not reached.
 **Native M2 Windows boot, accelerated graphics and built-in input remain
-unqualified.** The last physical trial did not enumerate usable USB storage.
-No newer physical boot or Windows Setup screen has been observed.
+unqualified.** No Windows Setup screen has been observed. The new staged storage
+binding candidate is built; its hardware outcome is pending.
 
-The direct path connects the registered PCI roots for the synthetic NVMe, then
+The direct path connects one level at a time: the single PCI root, the synthetic
+NVMe function at segment/bus/device/function 0/0/0/0, its whole namespace, then
+only the unique target GPT partition's filesystem. It reuses an already exposed
+target filesystem and refuses ambiguous topology. It prints each blocking call's
+entry, device path and return. It does not recursively attach every partition's
+filesystem before selecting the target. The selector then
 resolves one explicitly configured GPT partition UUID. It opens only
 `\EFI\BOOT\BOOTAA64.EFI` on that partition, without a filename case distinction,
 and requires an ARM64 PE32+ EFI application. A duplicate target UUID is rejected.
 It retains standard BDS image/security checks and the bounded discovery deadline.
 
 ## Single-volume contents
+
+For the already staged internal ESP, update firmware without recopying Windows:
+
+```sh
+sudo /usr/bin/python3 scripts/install-j413-direct-setup.py --firmware-only
+```
+
+This verifies the existing Setup hashes against its current bootstrap, preserves
+bootstrap/FD/media/firmware-manifest recovery copies, then replaces the firmware
+and its provenance. An update error restores the previous companion bytes.
+The printed `--restore` command restores both bootstrap and companion files.
+The new bootstrap SHA256 is
+`639d558d3e1abe42024df8edc298f12e283cc87906920851858a76e66db59cc9`.
+The previous e3919fd2 candidate is retained as the observed Mu-reaching baseline.
+No partition recreation, WIM recopy, security-policy change or reboot is performed.
 
 A FAT32 volume contains all of the following:
 

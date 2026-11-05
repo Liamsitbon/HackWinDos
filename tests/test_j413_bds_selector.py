@@ -14,7 +14,8 @@ class BdsSelectorTests(unittest.TestCase):
 #define EFI_INVALID_PARAMETER 4
 static BOOLEAN mSetupSelected;
 static int connects, inventories, nvme_connections;
-static EFI_STATUS J413ConnectBootNvme(void){assert(!connects);nvme_connections++;return EFI_SUCCESS;}
+static int mJ413DirectSetupGuid;
+static EFI_STATUS J413ConnectBootNvme(const int *target){assert(target==&mJ413DirectSetupGuid&&!connects);nvme_connections++;return EFI_SUCCESS;}
 static void J413UsbInventory(void){assert(connects==1);inventories++;}
 static EFI_STATUS J413ConnectBootUsb(void){assert(nvme_connections==1);connects++;return EFI_SUCCESS;}
 static EFI_STATUS J413NextDirectSetupOption(EFI_BOOT_MANAGER_LOAD_OPTION *o){return J413NextEfiOption(o);}

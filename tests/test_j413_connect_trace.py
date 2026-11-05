@@ -6,7 +6,7 @@ class ConnectTraceTests(unittest.TestCase):
         cc=shutil.which('cc')
         if not cc:self.skipTest('C compiler unavailable')
         header=(ROOT/'platforms/j413/mu/Silicon/Apple/AppleSiliconPkg/Drivers/WindowsAutoBootDxe/J413ConnectTrace.h').read_text()
-        header='\n'.join(line for line in header.splitlines() if not line.startswith('#include'))
+        header=header[header.index('STATIC EFI_STATUS J413ConnectBootUsb'):].rsplit('#endif', 1)[0]
         source=r'''
 #include <assert.h>
 #include <stdlib.h>
@@ -49,10 +49,7 @@ int main(void){reset();assert(J413ConnectBootUsb()==0&&entered==1&&returned==1&&
  reset();protocol_null=1;assert(J413ConnectBootUsb()==EFI_NOT_FOUND&&!connect_count&&free_count==1);
  reset();devices[2].Type=&other_guid;assert(J413ConnectBootUsb()==EFI_NOT_FOUND&&!connect_count&&free_count==1);
  reset();connect_fail=1;assert(J413ConnectBootUsb()==7&&entered==1&&returned==1&&free_count==2);
- reset();nvme_mode=1;assert(J413ConnectBootNvme()==0&&connect_count==1&&free_count==1);
- reset();nvme_mode=empty=1;assert(J413ConnectBootNvme()==EFI_NOT_FOUND&&!connect_count&&!free_count);
- reset();nvme_mode=enumeration_fail=1;assert(J413ConnectBootNvme()==7&&!connect_count&&!free_count);
- reset();nvme_mode=connect_fail=1;assert(J413ConnectBootNvme()==7&&connect_count==1&&free_count==1);return 0;}
+ return 0;}
 '''
         with tempfile.TemporaryDirectory() as d:
             p=Path(d);(p/'t.c').write_text(source)

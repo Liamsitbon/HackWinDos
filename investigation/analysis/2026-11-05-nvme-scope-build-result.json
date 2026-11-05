@@ -1,0 +1,36 @@
+{
+  "recorded_utc": "2026-11-05T20:58:56.220572+00:00",
+  "experiment": "EXP-20261105-J413-053",
+  "implementation_commit": "a030dd58e093e8984c46a6a674c4bb573b0ff17d",
+  "build_command": "scripts/build-j413-boot-experiment.sh",
+  "build_log_local": ".local/nvme-stall/build.log",
+  "manifest": "dist/j413/boot-experiment/MANIFEST.json",
+  "platform_overlay_sha256": "2e474585e708999cc2ec7b3bedabb10bb5b282f912368f1f152215bb7f4a341c",
+  "boot": {
+    "role": "standalone-bootstrap",
+    "sha256": "639d558d3e1abe42024df8edc298f12e283cc87906920851858a76e66db59cc9",
+    "size": 2542056
+  },
+  "fd": {
+    "role": "guest-firmware",
+    "sha256": "38b42f7bfb6cb3db52c90bf6fd9623ace740e8ac0e7f5ed0f52caa0c928781f4",
+    "size": 30965760
+  },
+  "profile": "debug",
+  "display": "physical",
+  "debug": "off",
+  "direct_setup": {
+    "loader_path": "\\EFI\\BOOT\\BOOTAA64.EFI",
+    "mode": "single-gpt-volume",
+    "partition_uuid": "6E5BC1A2-9871-4E5A-8E60-BF68C8E785BB"
+  },
+  "tests": "Four executed C policy/selector regressions pass including actual binding under ASan/UBSan; 28 installer transaction tests pass; no broad suite rerun.",
+  "installer_dry_run": "New default candidate verified and exact physical disk0s4 PARTUUID resolved; no mount or write.",
+  "installed": false,
+  "installation_boundary": "sudo -n reports password required; operator must run the prepared firmware-only installer",
+  "native_boot_qualified": false,
+  "hardware_hypothesis": "Excessive recursive binding scope is removed; actual hanging driver/cause remains unknown until next native trace.",
+  "recovery": ".local/recovery-20261105-before-nvme-scope/boot-experiment",
+  "recovery_sha256": "e3919fd288efc0cb0577274a2b9bec0c7b553691c6a760ec1f7ef1be725404e6",
+  "colima": "stopped after build"
+}

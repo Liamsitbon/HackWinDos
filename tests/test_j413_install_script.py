@@ -218,3 +218,100 @@ class DirectSetupInstallScriptTests(UsbDiscoveryInstallScriptTests):
             split.write_bytes(b'modified')
             with self.assertRaisesRegex(ValueError, 'Split Setup image changed'):
                 self.real_same_volume_check(self.mount)
+
+    def firmware_fixture(self):
+        digest = self.installer.digest
+        files = {}
+        for relative in ['efi/boot/bootaa64.efi', 'efi/microsoft/boot/bcd',
+                         'sources/boot.wim', 'boot/boot.sdi', 'setup.exe', 'm1n1/J413_EFI.fd']:
+            path = self.mount/relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(('fixture '+relative).encode())
+            files[relative] = {'size': path.stat().st_size, 'sha256': digest(path.read_bytes())}
+        split = self.mount/'sources/install.swm'
+        split.write_bytes(b'split fixture')
+        folder = self.mount/'J413Setup'
+        folder.mkdir()
+        previous = {'artifacts': {'boot.bin': {'sha256': digest(self.target.read_bytes())}}}
+        (folder/'FIRMWARE-MANIFEST.json').write_text(json.dumps(previous))
+        (folder/'MEDIA.json').write_text(json.dumps({
+            'partition_uuid': self.installer.ESP_UUID, 'mode': 'same-volume-windows-setup',
+            'firmware_manifest': previous, 'files': files,
+            'split_install_images': {'install.swm': {'size': split.stat().st_size,
+                                                    'sha256': digest(split.read_bytes())}}}))
+        image = self.root/'candidate/boot.bin'
+        image.parent.mkdir()
+        image.write_bytes(b'new payload')
+        fd = image.parent/'J413_EFI.fd'
+        fd.write_bytes(b'new firmware descriptor')
+        p = patch.object(self.installer, 'IMAGE', image)
+        p.start(); self.addCleanup(p.stop)
+        p = patch.object(self.installer, 'FIRMWARE_ONLY', True)
+        p.start(); self.addCleanup(p.stop)
+        p = patch('tools.check_j413_setup.inspect', return_value={'errors': []})
+        p.start(); self.addCleanup(p.stop)
+        self.installer.verify_same_volume.side_effect = self.real_same_volume_check
+        self.new_provenance = {'artifacts': {
+            'boot.bin': {'sha256': digest(image.read_bytes())},
+            'J413_EFI.fd': {'sha256': digest(fd.read_bytes())}}}
+        self.previous_companions = {r: (self.mount/r).read_bytes() for r in self.installer.COMPANION_FILES}
+        return image, split
+
+    def update_firmware(self, image):
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.installer.install(image.read_bytes(), 'disk9s7', image, self.new_provenance)
+
+    def test_firmware_only_preserves_setup_and_restores_all_firmware_companions(self):
+        image, split = self.firmware_fixture()
+        original_stat = split.stat()
+        with patch('tools.j413_setup_bundle.stage', side_effect=AssertionError('Windows must not be recopied')):
+            self.update_firmware(image)
+        self.assertEqual(self.target.read_bytes(), b'new payload')
+        self.assertEqual((self.mount/'m1n1/J413_EFI.fd').read_bytes(), b'new firmware descriptor')
+        self.assertEqual(split.read_bytes(), b'split fixture')
+        self.assertEqual(split.stat().st_mtime_ns, original_stat.st_mtime_ns)
+        self.installer.verify_same_volume.assert_called_once_with(
+            self.mount, expected_image_sha256=self.installer.digest(b'previous payload'))
+        metadata = json.loads((self.mount/'J413Setup/MEDIA.json').read_text())
+        self.assertEqual(metadata['firmware_manifest'], self.new_provenance)
+        record = self.recovery_record()
+        data, source, provenance = self.installer.recovery(record)
+        with patch.object(self.installer, 'FIRMWARE_ONLY', False), contextlib.redirect_stdout(io.StringIO()):
+            self.installer.install(data, 'disk9s7', source, provenance, restoring=True)
+        self.assertEqual(self.target.read_bytes(), b'previous payload')
+        for relative, content in self.previous_companions.items():
+            self.assertEqual((self.mount/relative).read_bytes(), content)
+
+    def test_partial_companion_failure_rolls_back_before_bootstrap_replacement(self):
+        image, _ = self.firmware_fixture()
+        real_replace = self.installer.os.replace
+        failed = False
+        def fail_media_once(source, target):
+            nonlocal failed
+            if Path(target) == self.mount/'J413Setup/MEDIA.json' and not failed:
+                failed = True
+                raise OSError('simulated companion write failure')
+            return real_replace(source, target)
+        with patch.object(self.installer.os, 'replace', side_effect=fail_media_once):
+            with self.assertRaisesRegex(OSError, 'simulated companion'):
+                self.update_firmware(image)
+        self.assertEqual(self.target.read_bytes(), b'previous payload')
+        for relative, content in self.previous_companions.items():
+            self.assertEqual((self.mount/relative).read_bytes(), content)
+        self.assertIn('prior bootstrap/companions restored', self.ledger.read_text())
+        self.assertFalse(list(self.mount.rglob('.j413-update.*')))
+
+    def test_changed_setup_refuses_firmware_update_and_corrupt_backup_refuses_restore(self):
+        image, split = self.firmware_fixture()
+        split.write_bytes(b'tampered')
+        with self.assertRaisesRegex(ValueError, 'Split Setup image changed'):
+            self.update_firmware(image)
+        self.assertEqual(self.target.read_bytes(), b'previous payload')
+        for relative, content in self.previous_companions.items():
+            self.assertEqual((self.mount/relative).read_bytes(), content)
+        entries = self.installer.backup_companions(self.mount, self.root)
+        record = {'companion_files': entries}
+        self.installer.load_companions(self.root, record)
+        (self.root/'companion-0.before').write_bytes(b'corrupt')
+        with self.assertRaisesRegex(ValueError, 'hash mismatch'):
+            self.installer.load_companions(self.root, record)

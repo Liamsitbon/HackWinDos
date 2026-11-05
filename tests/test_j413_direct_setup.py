@@ -43,7 +43,7 @@ static EFI_STATUS partition_protocol(EFI_HANDLE handle,int *guid,VOID **out){
 static struct {EFI_STATUS (*LocateHandleBuffer)(int,int*,VOID*,UINTN*,EFI_HANDLE**);EFI_STATUS (*HandleProtocol)(EFI_HANDLE,int*,VOID**);} direct_services={partition_locate,partition_protocol};
 #undef gBS
 #define gBS (&direct_services)
-''' + re.sub(r'^#include[^\n]*$', '', HEADER.read_text(), flags=re.M) + r'''
+''' + re.sub(r'^#include[^\n]*$', '', (HEADER.parent/'J413SetupPartition.h').read_text() + HEADER.read_text(), flags=re.M) + r'''
 static void reset(void){assert(!allocations);mEfiScanned=mode=fs_accesses=identities=0;path_fail=init_fail=0;
  for(int i=0;i<3;i++){memset(&partitions[i],0,sizeof(partitions[i]));partitions[i].Revision=0x1000;partitions[i].Type=2;partitions[i].Info.Gpt.UniquePartitionGUID.Data1=(UINT32)(i+10);}
  partitions[1].Info.Gpt.UniquePartitionGUID=target;first[0].name=L"EFI";efi[0].name=L"BOOT";boot[0].name=L"BOOTAA64.EFI";boot[0].kind=0;}

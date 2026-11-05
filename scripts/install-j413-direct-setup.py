@@ -19,10 +19,12 @@ from tools.verify_install_image import verify
 
 ESP_UUID = '6E5BC1A2-9871-4E5A-8E60-BF68C8E785BB'
 IMAGE = ROOT / 'dist/j413/boot-experiment/boot.bin'
-IMAGE_SHA256 = 'e3919fd288efc0cb0577274a2b9bec0c7b553691c6a760ec1f7ef1be725404e6'
+IMAGE_SHA256 = '639d558d3e1abe42024df8edc298f12e283cc87906920851858a76e66db59cc9'
 LEDGER = ROOT / 'investigation/EXPERIMENTS.md'
 BACKUPS = ROOT / '.local/direct-setup-installs'
 SETUP_SOURCE = None
+FIRMWARE_ONLY = False
+COMPANION_FILES = ('m1n1/J413_EFI.fd', 'J413Setup/FIRMWARE-MANIFEST.json', 'J413Setup/MEDIA.json')
 
 
 def digest(data):
@@ -56,7 +58,7 @@ def find_esp():
     return disk
 
 
-def verify_same_volume(mount):
+def verify_same_volume(mount, expected_image_sha256=None):
     from tools.check_j413_setup import inspect
     result = inspect(mount)
     if result['errors']:
@@ -64,7 +66,8 @@ def verify_same_volume(mount):
     metadata = json.loads((mount/'J413Setup/MEDIA.json').read_text())
     if metadata.get('partition_uuid') != ESP_UUID or metadata.get('mode') != 'same-volume-windows-setup':
         raise ValueError('Setup manifest belongs to another volume')
-    if metadata.get('firmware_manifest', {}).get('artifacts', {}).get('boot.bin', {}).get('sha256') != IMAGE_SHA256:
+    expected = IMAGE_SHA256 if expected_image_sha256 is None else expected_image_sha256
+    if metadata.get('firmware_manifest', {}).get('artifacts', {}).get('boot.bin', {}).get('sha256') != expected:
         raise ValueError('Setup manifest names a different boot image')
     required = {'efi/boot/bootaa64.efi','efi/microsoft/boot/bcd','sources/boot.wim','boot/boot.sdi','setup.exe'}
     files = metadata.get('files', {})
@@ -96,6 +99,77 @@ def file_digest(path):
         for block in iter(lambda: stream.read(4*1024*1024), b''):
             result.update(block)
     return result.hexdigest()
+
+
+def atomic_file(path, data):
+    temporary = path.with_name('.j413-update.'+uuid.uuid4().hex)
+    try:
+        with temporary.open('xb') as stream:
+            stream.write(data)
+            stream.flush()
+            os.fsync(stream.fileno())
+        temporary.chmod(0o644)
+        if temporary.read_bytes() != data:
+            raise ValueError('Temporary companion verification failed')
+        os.replace(temporary, path)
+        if path.read_bytes() != data:
+            raise ValueError('Installed companion verification failed')
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
+def load_companions(directory, record):
+    entries = record.get('companion_files', {})
+    if set(entries) != set(COMPANION_FILES):
+        raise ValueError('Incomplete firmware companion recovery record')
+    result = {}
+    for relative, entry in entries.items():
+        name = entry['backup_file']
+        if not re.fullmatch(r'companion-[0-2]\.before', name):
+            raise ValueError('Invalid companion backup path')
+        path = directory/name
+        if not path.is_file() or path.is_symlink():
+            raise ValueError('Missing companion backup')
+        data = path.read_bytes()
+        if digest(data) != entry['sha256']:
+            raise ValueError('Companion recovery hash mismatch')
+        result[relative] = data
+    return result
+
+
+def backup_companions(mount, directory):
+    entries = {}
+    for index, relative in enumerate(COMPANION_FILES):
+        path = mount/relative
+        if not path.is_file() or path.is_symlink() or path.parent.is_symlink():
+            raise ValueError('Expected a regular firmware companion: '+relative)
+        data = path.read_bytes()
+        name = f'companion-{index}.before'
+        with (directory/name).open('xb') as stream:
+            stream.write(data)
+            stream.flush()
+            os.fsync(stream.fileno())
+        entries[relative] = {'backup_file': name, 'sha256': digest(data)}
+    record = {'companion_files': entries}
+    load_companions(directory, record)  # Verify every backup before any ESP mutation.
+    return entries
+
+
+def firmware_companions(mount, provenance, bootstrap):
+    metadata = json.loads((mount/'J413Setup/MEDIA.json').read_text())
+    fd = (IMAGE.parent/'J413_EFI.fd').read_bytes()
+    if digest(fd) != provenance['artifacts']['J413_EFI.fd']['sha256']:
+        raise ValueError('FD differs from candidate manifest')
+    if digest(bootstrap) != provenance['artifacts']['boot.bin']['sha256']:
+        raise ValueError('Bootstrap differs from candidate manifest')
+    metadata['firmware_manifest'] = provenance
+    metadata['includes_bootstrap'] = True
+    metadata['firmware_updated_utc'] = datetime.now(timezone.utc).isoformat()
+    for relative, data in [('m1n1/J413_EFI.fd', fd), ('m1n1/boot.bin', bootstrap)]:
+        metadata['files'][relative] = {'size': len(data), 'sha256': digest(data)}
+    return {'m1n1/J413_EFI.fd': fd,
+            'J413Setup/FIRMWARE-MANIFEST.json': (json.dumps(provenance, indent=2)+'\n').encode(),
+            'J413Setup/MEDIA.json': (json.dumps(metadata, indent=2)+'\n').encode()}
 
 
 def candidate():
@@ -161,6 +235,8 @@ def install(data, disk, source, provenance, restoring=False):
            'Failure criterion: target, mount, backup, copy or hash verification fails. '
            'Evidence: this entry and backup directory; no format, repair, boot-policy change or reboot.\n')
     temporary = None
+    companion_rollback = None
+    bootstrap_replaced = False
     try:
         run('diskutil', 'mount', disk)
         info = disk_info(disk)
@@ -190,7 +266,23 @@ def install(data, disk, source, provenance, restoring=False):
             os.fsync(stream.fileno())
         record(f'\nBefore replacement {exp_id}: recovery {backup}, SHA256 {digest(old)}; '
                'backup verified. Existing bootability is not newly qualified; macOS startup picker remains recovery.\n')
-        if not restoring:
+        if FIRMWARE_ONLY or (restoring and provenance.get('companion_files')):
+            if restoring:
+                changes = load_companions(source.parent, provenance)
+            else:
+                print('Verifying existing Setup bytes; updating firmware without recopying Windows...', flush=True)
+                verify_same_volume(Path(mount), expected_image_sha256=digest(old))
+                changes = firmware_companions(Path(mount), provenance, data)
+            entries = backup_companions(Path(mount), directory)
+            recovery_metadata = json.loads(metadata.read_text())
+            recovery_metadata['companion_files'] = entries
+            atomic_file(metadata, (json.dumps(recovery_metadata, indent=2)+'\n').encode())
+            companion_rollback = load_companions(directory, recovery_metadata)
+            record(f'\nBefore companion replacement {exp_id}: verified recovery hashes '
+                   f'{json.dumps(entries, sort_keys=True)}. Windows installer bytes are retained.\n')
+            for relative, content in changes.items():
+                atomic_file(Path(mount)/relative, content)
+        elif not restoring:
             if SETUP_SOURCE is not None:
                 from tools.j413_setup_bundle import stage
                 print('Staging and verifying complete same-volume Setup before replacing the bootstrap...', flush=True)
@@ -205,6 +297,7 @@ def install(data, disk, source, provenance, restoring=False):
         if digest(temporary.read_bytes()) != digest(data):
             raise ValueError('Temporary payload verification failed')
         os.replace(temporary, target)
+        bootstrap_replaced = True
         temporary = None
         run('sync')
         if digest(target.read_bytes()) != digest(data):
@@ -221,6 +314,16 @@ def install(data, disk, source, provenance, restoring=False):
     except Exception as exc:
         if temporary is not None:
             temporary.unlink(missing_ok=True)
+        if companion_rollback is not None:
+            try:
+                if bootstrap_replaced:
+                    atomic_file(target, old)
+                for relative, content in companion_rollback.items():
+                    atomic_file(Path(mount)/relative, content)
+                run('sync')
+                record(f'\nRollback {exp_id}: prior bootstrap/companions restored and byte-verified after update failure.\n')
+            except Exception as rollback_error:
+                record(f'\nRollback {exp_id} FAILED: {json.dumps(str(rollback_error))}; use recorded recovery before boot.\n')
         record(f'\nAfter {datetime.now(timezone.utc).isoformat()}, {exp_id}: FAILED '
                f'{json.dumps(str(exc))}; verdict inconclusive. Backup directory {directory}; '
                'no automatic repair or reboot. Check the installed hash before any launch.\n')
@@ -228,7 +331,7 @@ def install(data, disk, source, provenance, restoring=False):
 
 
 def main():
-    global ESP_UUID, IMAGE_SHA256, SETUP_SOURCE
+    global ESP_UUID, IMAGE_SHA256, SETUP_SOURCE, FIRMWARE_ONLY
     parser = argparse.ArgumentParser(description=__doc__, epilog=
         'Recreating the UEFI environment is a separate procedure: '
         'https://asahilinux.org/docs/platform/open-os-interop/ . '
@@ -239,12 +342,16 @@ def main():
     parser.add_argument('--restore', type=Path, metavar='RECOVERY.json')
     parser.add_argument('--image-sha256', help='explicit SHA256 of a rebuilt and recorded direct candidate')
     parser.add_argument('--setup-source', type=Path, help='complete ARM64 Setup media to stage after the bootstrap backup')
+    parser.add_argument('--firmware-only', action='store_true', help='verify existing Setup and update firmware/provenance with a complete companion backup; no Windows recopy')
     args = parser.parse_args()
     if args.image_sha256:
         if not re.fullmatch('[0-9a-fA-F]{64}', args.image_sha256):
             raise ValueError('Invalid image SHA256')
         IMAGE_SHA256 = args.image_sha256.lower()
     SETUP_SOURCE = args.setup_source
+    FIRMWARE_ONLY = args.firmware_only
+    if FIRMWARE_ONLY and (SETUP_SOURCE is not None or args.restore is not None):
+        raise ValueError('--firmware-only cannot be combined with --setup-source or --restore')
     if args.esp_uuid:
         ESP_UUID = str(uuid.UUID(args.esp_uuid)).upper()
     data, source, provenance = recovery(args.restore) if args.restore else candidate()
