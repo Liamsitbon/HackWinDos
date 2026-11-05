@@ -1,0 +1,33 @@
+{
+  "recorded_utc": "2026-11-05T21:41:24.817712+00:00",
+  "experiment": "EXP-20261105-J413-055",
+  "manifest": "dist/j413-winpe-diagnostics/MANIFEST.json",
+  "profile": "winpe-diagnostic",
+  "firmware_sha256_unchanged": "639d558d3e1abe42024df8edc298f12e283cc87906920851858a76e66db59cc9",
+  "boot_wim": {
+    "sha256": "965e81d96c8b3586dca213fdfe9cbf0dea7b16afd9ceb6186c6cd40f2e735dd0",
+    "size": 635027475
+  },
+  "wait_helper": {
+    "sha256": "1b2914a5ebf98d72c68a2ef5ae4a5556b47b4934fe56b5281c3369ff6d7ff43d",
+    "size": 2048
+  },
+  "images": [
+    {
+      "index": "1",
+      "name": "Microsoft Windows PE (arm64)",
+      "architecture": "ARM64"
+    },
+    {
+      "index": "2",
+      "name": "Microsoft Windows Setup (arm64)",
+      "architecture": "ARM64"
+    }
+  ],
+  "verification": "Real ARM64 PE32+ console helper; exact three embedded files extracted and compared; wimlib verifies complete WIM; four install/restore transaction tests pass; /usr/bin/python3 default dry-run resolves exact physical ESP.",
+  "installed": false,
+  "native_execution_qualified": false,
+  "boundary": "sudo password required; no diagnostic WIM or firmware was installed. Owner collect-only command prepared for existing UEFI log.",
+  "original_boot_wim_sha256": "dcf58a3d6be5d8747ba8b475f6bbc3782a53bc5dc14c7b11e73ff140deeab534",
+  "qualification": "Diagnostic preparation only; not a USB/input/storage fix."
+}

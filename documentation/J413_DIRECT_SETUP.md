@@ -3,10 +3,13 @@
 A fresh internal `HackWinDos UEFI` host environment now exists with a 2.5GB
 APFS stub and a 9.5GB FAT ESP. The candidate is bound to that real ESP.
 EXP-20261105-J413-052 reached native Mu/BDS, then hung during recursive PCI-root
-connection for several hours (IMG_6327). The Windows loader was not reached.
+connection for several hours (IMG_6327). After the staged-binding correction,
+EXP-20261105-J413-054 photographs Windows logo, Setup and its missing-media-driver
+page (IMG_6329/6330/6331). This confirms native Setup entry, not disk/media access
+or successful installation. See [WinPE evidence and diagnostics](J413_WINPE_DIAGNOSTICS_HE.md).
 **Native M2 Windows boot, accelerated graphics and built-in input remain
-unqualified.** No Windows Setup screen has been observed. The new staged storage
-binding candidate is built; its hardware outcome is pending.
+unqualified.** Built-in input remains unavailable. An external mouse retry was
+reported unresponsive on both ports; no guest PnP/USB or VBUS measurement exists.
 
 The direct path connects one level at a time: the single PCI root, the synthetic
 NVMe function at segment/bus/device/function 0/0/0/0, its whole namespace, then

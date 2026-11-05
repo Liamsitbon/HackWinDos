@@ -1,0 +1,18 @@
+{
+  "recorded_utc": "2026-11-05T21:34:22.478005+00:00",
+  "phase": "External mouse operator retry; exact native timing not captured",
+  "operator_report": "Mouse did not respond and its LEDs did not light; no error message actually appeared. Adapter tried in both ports by swapping with SanDisk, initially port nearest MagSafe.",
+  "usb_identification_in_macos": {
+    "mouse": "E-Signal Inde-mouse",
+    "vid": "04d9",
+    "pid": "a09f",
+    "parent_hub": "GenesysLogic USB2.1 Hub",
+    "controller_location_id": "0x00000000",
+    "sandisk_controller_location_id": "0x01000000"
+  },
+  "interpretation": "Mouse and hub enumerate in macOS; LED observation alone does not measure VBUS or distinguish absent power from enumeration/driver failure. Previous iPad-attached mouse report remains explicitly invalid.",
+  "firmware_candidate": "639d558d3e1abe42024df8edc298f12e283cc87906920851858a76e66db59cc9",
+  "changes_installed_since_setup_photos": false,
+  "winpe_diagnostic_build": "Failed source-image dependency check: findstr.exe absent. No diagnostic WIM produced or installed.",
+  "first_esp_mount": "diskutil mount disk0s4 failed; no repair attempted."
+}

@@ -1,0 +1,28 @@
+{
+  "recorded_utc": "2026-11-05T21:15:46.342308+00:00",
+  "experiment": "EXP-20261105-J413-054",
+  "install_experiment": "EXP-20261105T210449Z-J413-ESP-2ae55439",
+  "installed_sha256_recorded": "639d558d3e1abe42024df8edc298f12e283cc87906920851858a76e66db59cc9",
+  "photos_sha256": {
+    "IMG_6329.HEIC": "56c00ffbc3c541017ce241668db3705eeb1dd1590b5a124f7f63b2f58b484ac0",
+    "IMG_6330.HEIC": "3c3b55b7b0b230733f6b64993e8760e7a0405a1e93fb4f376ca1435d6777c2f4",
+    "IMG_6331.JPG": "966a8da6b3f124d9278fe8c9ba74297f2e5a5c85941c55c54d0598dc65081583"
+  },
+  "observed_phases": [
+    "Windows logo and spinner",
+    "Windows 11 Setup Please wait",
+    "Windows 11 Setup Install driver to show hardware"
+  ],
+  "visible_error": "A media driver your computer needs is missing.",
+  "elapsed": "not recorded",
+  "windows_setup_entry": true,
+  "windows_full_installation": false,
+  "media_or_target_storage_visible_in_winpe": "unknown; no disk or PnP log yet",
+  "built_in_keyboard_trackpad": "operator reports unresponsive",
+  "external_mouse": "NOT TESTED: operator corrected prior report; adapter was attached to iPad, not MacBook",
+  "display": "Windows graphical Setup rendered across successive phases",
+  "usb_storage_irq_timer_all_cpus_network": "unmeasured",
+  "windows_stop_code": null,
+  "verdict": "fixed-GUID loader and native Windows Setup entry observed; media access/input remain unqualified",
+  "causality": "Staged storage binding candidate passes preceding recursive-connection boundary; exact formerly hanging descendant remains unidentified."
+}
