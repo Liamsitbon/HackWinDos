@@ -55,6 +55,7 @@ static UINT32 midr=0x61000000, streams=16;
 static char *compatible="dart,t8110"; static size_t compatible_size=11;
 static UINT64 resource_base=0x502f00000, resource_size=0x100000;
 static UINT64 last_write_address; static UINT32 last_write_value;
+static UINTN suppressed_tcr, writes_address[4096]; static UINT32 writes_value[4096];
 static dt_node_t *dt_get(const char *n) { return missing || n[strlen(n)-1]=='0' ? NULL : &node; }
 static int dt_node_reg(dt_node_t *n,UINT32 index,UINT64 *base,UINT64 *size) {
  assert(n==&node); if(reg_fail)return 1;
@@ -63,8 +64,8 @@ static int dt_node_reg(dt_node_t *n,UINT32 index,UINT64 *base,UINT64 *size) {
 }
 static void *dt_node_prop(dt_node_t *n,const char *prop,size_t *size) { assert(n==&node);(void)prop;*size=compatible_size;return compatible; }
 static UINT32 ArmReadMidr(void){return midr;}
-static UINT32 MmioRead32(UINTN address) {read_count++;switch(address&0x7ffff) {case 0xc:return streams; case 4:return 1; case 0x80:return busy ? BIT(31):0;case 0x20:return busy ? BIT(2):0;default:return 0;}}
-static void MmioWrite32(UINTN address,UINT32 value) {write_count++;last_write_address=address;last_write_value=value;}
+static UINT32 MmioRead32(UINTN address) {read_count++;switch(address&0x7ffff) {case 0xc:return streams; case 4:return 1; case 0x80:return busy ? BIT(31):0;case 0x20:return busy ? BIT(2):0;default:for(int i=write_count-1;i>=0;i--)if(writes_address[i]==address)return writes_value[i];return 0;}}
+static void MmioWrite32(UINTN address,UINT32 value) {assert(write_count<4096);writes_address[write_count]=address;writes_value[write_count]=(address==suppressed_tcr)?0:value;write_count++;last_write_address=address;last_write_value=value;}
 static void MicroSecondDelay(UINTN n){delayed+=(int)n;}
 static EFI_STATUS install(EFI_HANDLE *h,void *g,int mode,void *p){(void)h;(void)g;(void)mode;(void)p;installed++;return 0;}
 static void close_event(EFI_EVENT e){(void)e;closed++;}
@@ -114,9 +115,16 @@ int main(void){
  reset(); streams=0;assert(AppleDartIoMmuDxeInitialize(NULL,NULL)==EFI_DEVICE_ERROR && !write_count && !installed);
  reset(); streams=257;assert(AppleDartIoMmuDxeInitialize(NULL,NULL)==EFI_DEVICE_ERROR && !write_count && !installed);
  reset();busy=1;assert(AppleDartIoMmuDxeInitialize(NULL,NULL)==EFI_TIMEOUT && !installed && delayed==100);
+ // A write request is not proof of bypass: first and last stream in each bank.
+ for(int bank=0;bank<2;bank++)for(int sid=0;sid<16;sid+=15){
+  reset(); suppressed_tcr=resource_base+(UINTN)bank*0x80000+0x1000+4*sid;
+  assert(AppleDartIoMmuDxeInitialize(NULL,NULL)==EFI_DEVICE_ERROR && !installed);
+ }
+ suppressed_tcr=0; reset();assert(AppleDartIoMmuDxeInitialize(NULL,NULL)==0 && installed==1);
 }
 '''
-        self.execute(PRELUDE+header+'\nAPPLE_DART_INFO DartInfo[4];\n'+actual+main)
+        readback=MU/'Include/Library/J413UsbDartReadback.h'
+        self.execute(PRELUDE+header+'\nAPPLE_DART_INFO DartInfo[4];\n'+(readback.read_text() if readback.exists() else '')+actual+main)
 
     def test_usb_never_registers_failed_initialization_as_callback(self):
         source=(MU/'Drivers/AppleUsbTypeCBringupDxe/AppleUsbTypeCBringupDxe.c').read_text()

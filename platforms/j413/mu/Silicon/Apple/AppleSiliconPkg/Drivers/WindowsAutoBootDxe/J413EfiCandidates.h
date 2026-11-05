@@ -1,12 +1,12 @@
-/** @file Recursive, filesystem-independent ARM64 EFI application discovery.
+/** @file Exact-path, filesystem-independent ARM64 fallback loader discovery.
     SPDX-License-Identifier: BSD-2-Clause-Patent **/
 #ifndef J413_EFI_CANDIDATES_H
 #define J413_EFI_CANDIDATES_H
 #define J413_EFI_MAX_PATH 1024
-#define J413_EFI_MAX_DEPTH 32
-#define J413_EFI_MAX_ENTRIES 100000
 #define J413_EFI_MAX_CANDIDATES 256
 
+STATIC BOOLEAN mEfiScanned;
+#ifndef J413_DIRECT_SETUP_ONLY
 typedef struct J413_EFI_CANDIDATE {
   struct J413_EFI_CANDIDATE *Next;
   EFI_HANDLE Handle;
@@ -14,8 +14,7 @@ typedef struct J413_EFI_CANDIDATE {
 } J413_EFI_CANDIDATE;
 STATIC J413_EFI_CANDIDATE *mEfiHead, *mEfiTail;
 STATIC UINTN mEfiCount;
-STATIC BOOLEAN mEfiScanned;
-STATIC EFI_HANDLE mEfiAlreadyAttemptedHandle;
+#endif
 
 STATIC CHAR16 J413EfiFold(CHAR16 C) { return C >= L'A' && C <= L'Z' ? C + (L'a' - L'A') : C; }
 STATIC BOOLEAN J413EfiSamePath(CONST CHAR16 *A, CONST CHAR16 *B) {
@@ -27,6 +26,76 @@ STATIC UINT32 J413EfiLe32(CONST UINT8 *P) {
 }
 STATIC UINT16 J413EfiLe16(CONST UINT8 *P) { return (UINT16)(P[0] | ((UINT16)P[1] << 8)); }
 
+// Some third-party filesystems have case-sensitive Open(). Resolve only the
+// three standard components there; never recurse or select another EFI name.
+STATIC EFI_STATUS J413EfiFindName(EFI_FILE_PROTOCOL *Directory, CONST CHAR16 *Wanted,
+                                BOOLEAN IsDirectory, CHAR16 *Name) {
+  UINTN Capacity = 512;
+  EFI_FILE_INFO *Info = AllocatePool(Capacity);
+  EFI_STATUS Status;
+  if (Info == NULL) return EFI_OUT_OF_RESOURCES;
+  Status = Directory->SetPosition(Directory, 0);
+  if (EFI_ERROR(Status)) { FreePool(Info); return Status; }
+  Status = EFI_NOT_FOUND;
+  for (UINTN Entry = 0; Entry < 8192; ) {
+    UINTN Bytes = Capacity;
+    Status = Directory->Read(Directory, &Bytes, Info);
+    if (Status == EFI_BUFFER_TOO_SMALL) {
+      EFI_FILE_INFO *Larger;
+      if (Bytes <= Capacity || Bytes > 65536) { Status = EFI_VOLUME_CORRUPTED; break; }
+      Larger = AllocatePool(Bytes);
+      if (Larger == NULL) { Status = EFI_OUT_OF_RESOURCES; break; }
+      FreePool(Info); Info = Larger; Capacity = Bytes;
+      continue;
+    }
+    if (EFI_ERROR(Status)) break;
+    if (Bytes == 0) { Status = EFI_NOT_FOUND; break; }
+    Entry++;
+    if (Bytes > Capacity || Bytes < OFFSET_OF(EFI_FILE_INFO, FileName) + sizeof(CHAR16) ||
+        Info->Size > Bytes || Info->Size < OFFSET_OF(EFI_FILE_INFO, FileName) + sizeof(CHAR16)) {
+      Status = EFI_VOLUME_CORRUPTED; break;
+    }
+    {
+      UINTN Limit = (UINTN)(Info->Size - OFFSET_OF(EFI_FILE_INFO, FileName)) / sizeof(CHAR16);
+      UINTN Length = 0;
+      while (Length < Limit && Info->FileName[Length] != 0) Length++;
+      if (Length == Limit) { Status = EFI_VOLUME_CORRUPTED; break; }
+      if (Length == StrLen(Wanted) && J413EfiSamePath(Info->FileName, Wanted) &&
+          ((Info->Attribute & EFI_FILE_DIRECTORY) != 0) == IsDirectory) {
+        CopyMem(Name, Info->FileName, (Length + 1) * sizeof(CHAR16));
+        Status = EFI_SUCCESS; break;
+      }
+    }
+    Status = EFI_NOT_FOUND;
+  }
+  FreePool(Info);
+  return Status;
+}
+
+STATIC EFI_STATUS J413EfiResolveFallback(EFI_FILE_PROTOCOL *Root, CHAR16 *Path) {
+  CONST CHAR16 *Names[] = {L"EFI", L"BOOT", L"BOOTAA64.EFI"};
+  EFI_FILE_PROTOCOL *Directory = Root;
+  EFI_STATUS Status = EFI_NOT_FOUND;
+  Path[0] = 0;
+  for (UINTN Index = 0; Index < 3; Index++) {
+    CHAR16 Name[16]; // Each match has exactly the corresponding standard name's length.
+    UINTN Length = StrLen(Path);
+    Status = J413EfiFindName(Directory, Names[Index], Index < 2, Name);
+    if (EFI_ERROR(Status)) break;
+    Path[Length++] = L'\\';
+    CopyMem(Path + Length, Name, (StrLen(Name) + 1) * sizeof(CHAR16));
+    if (Index < 2) {
+      EFI_FILE_PROTOCOL *Next = NULL;
+      Status = Root->Open(Root, &Next, Path, EFI_FILE_MODE_READ, 0);
+      if (EFI_ERROR(Status) || Next == NULL) { Status = EFI_NOT_FOUND; break; }
+      if (Directory != Root) Directory->Close(Directory);
+      Directory = Next;
+    }
+  }
+  if (Directory != Root) Directory->Close(Directory);
+  return Status;
+}
+
 // Header preflight only. Standard BDS LoadImage still owns complete validation/security.
 STATIC BOOLEAN J413EfiApplication(EFI_FILE_PROTOCOL *Root, CHAR16 *Path) {
   EFI_FILE_PROTOCOL *File = NULL;
@@ -34,6 +103,9 @@ STATIC BOOLEAN J413EfiApplication(EFI_FILE_PROTOCOL *Root, CHAR16 *Path) {
   UINTN Size = sizeof(Dos);
   BOOLEAN Valid = FALSE;
   EFI_STATUS Status = Root->Open(Root, &File, Path, EFI_FILE_MODE_READ, 0);
+  if (Status == EFI_NOT_FOUND && !EFI_ERROR(J413EfiResolveFallback(Root, Path))) {
+    Status = Root->Open(Root, &File, Path, EFI_FILE_MODE_READ, 0);
+  }
   if (EFI_ERROR(Status) || File == NULL) return FALSE;
   Status = File->Read(File, &Size, Dos);
   if (!EFI_ERROR(Status) && Size == sizeof(Dos) && Dos[0] == 'M' && Dos[1] == 'Z') {
@@ -53,9 +125,9 @@ STATIC BOOLEAN J413EfiApplication(EFI_FILE_PROTOCOL *Root, CHAR16 *Path) {
   return Valid;
 }
 
+#ifndef J413_DIRECT_SETUP_ONLY
 STATIC VOID J413EfiQueue(EFI_HANDLE Handle, EFI_FILE_PROTOCOL *Root, CHAR16 *Path) {
   J413_EFI_CANDIDATE *Item;
-  if (Handle == mEfiAlreadyAttemptedHandle && J413EfiSamePath(Path, L"\\EFI\\BOOT\\BOOTAA64.EFI")) return;
   if (mEfiCount >= J413_EFI_MAX_CANDIDATES || StrLen(Path) >= J413_EFI_MAX_PATH) return;
   for (Item = mEfiHead; Item != NULL; Item = Item->Next) {
     if (Item->Handle == Handle && J413EfiSamePath(Item->Path, Path)) return;
@@ -71,57 +143,6 @@ STATIC VOID J413EfiQueue(EFI_HANDLE Handle, EFI_FILE_PROTOCOL *Root, CHAR16 *Pat
   Print(L"UEFI EFI: found %s\r\n", Path);
 }
 
-STATIC VOID J413EfiWalk(EFI_HANDLE Handle, EFI_FILE_PROTOCOL *Root,
-  EFI_FILE_PROTOCOL *Directory, CONST CHAR16 *Parent, UINTN Depth, UINTN *Visited) {
-  EFI_FILE_INFO *Info;
-  UINTN Capacity = 4096;
-  if (Depth >= J413_EFI_MAX_DEPTH) { Print(L"UEFI EFI: directory depth limit at %s\r\n", Parent); return; }
-  Info = AllocatePool(Capacity);
-  if (Info == NULL) return;
-  while (*Visited < J413_EFI_MAX_ENTRIES && mEfiCount < J413_EFI_MAX_CANDIDATES) {
-    UINTN Size = Capacity, NameLength = 0, ParentLength;
-    EFI_STATUS Status = Directory->Read(Directory, &Size, Info);
-    CHAR16 *Path;
-    if (Status == EFI_BUFFER_TOO_SMALL && Size > Capacity && Size <= 65536) {
-      EFI_FILE_INFO *Larger = AllocatePool(Size);
-      if (Larger == NULL) break;
-      FreePool(Info); Info = Larger; Capacity = Size; continue;
-    }
-    if (EFI_ERROR(Status) || Size == 0) break;
-    (*Visited)++;
-    if (Size > Capacity || Size < OFFSET_OF(EFI_FILE_INFO, FileName) + sizeof(CHAR16) ||
-        Info->Size > Size || Info->Size < OFFSET_OF(EFI_FILE_INFO, FileName) + sizeof(CHAR16)) break;
-    UINTN NameCapacity = (UINTN)(Info->Size - OFFSET_OF(EFI_FILE_INFO, FileName)) / sizeof(CHAR16);
-    while (NameLength < NameCapacity && Info->FileName[NameLength] != 0) NameLength++;
-    if (NameLength == 0 || NameLength == NameCapacity) continue;
-    if (J413EfiSamePath(Info->FileName, L".") || J413EfiSamePath(Info->FileName, L"..")) continue;
-    BOOLEAN BadName = FALSE;
-    for (UINTN Index = 0; Index < NameLength; Index++) {
-      if (Info->FileName[Index] == L'\\' || Info->FileName[Index] == L'/') BadName = TRUE;
-    }
-    if (BadName) continue;
-    ParentLength = StrLen(Parent);
-    if (ParentLength + NameLength + 2 > J413_EFI_MAX_PATH) continue;
-    Path = AllocatePool((ParentLength + NameLength + 2) * sizeof(CHAR16));
-    if (Path == NULL) break;
-    CopyMem(Path, Parent, ParentLength * sizeof(CHAR16));
-    Path[ParentLength] = L'\\';
-    CopyMem(Path + ParentLength + 1, Info->FileName, (NameLength + 1) * sizeof(CHAR16));
-    if ((Info->Attribute & EFI_FILE_DIRECTORY) != 0) {
-      EFI_FILE_PROTOCOL *Child = NULL;
-      Status = Root->Open(Root, &Child, Path, EFI_FILE_MODE_READ, 0);
-      if (!EFI_ERROR(Status) && Child != NULL) {
-        J413EfiWalk(Handle, Root, Child, Path, Depth + 1, Visited);
-        Child->Close(Child);
-      }
-    } else if (NameLength >= 4 && J413EfiSamePath(Info->FileName + NameLength - 4, L".efi")) {
-      J413EfiQueue(Handle, Root, Path);
-    }
-    FreePool(Path);
-  }
-  FreePool(Info);
-}
-
 STATIC EFI_STATUS J413NextEfiOption(EFI_BOOT_MANAGER_LOAD_OPTION *Option) {
   EFI_STATUS Status;
   if (!mEfiScanned) {
@@ -130,29 +151,22 @@ STATIC EFI_STATUS J413NextEfiOption(EFI_BOOT_MANAGER_LOAD_OPTION *Option) {
     mEfiScanned = TRUE;
     Status = gBS->LocateHandleBuffer(ByProtocol, &gEfiSimpleFileSystemProtocolGuid, NULL, &Count, &Handles);
     if (EFI_ERROR(Status)) { if (Handles != NULL) FreePool(Handles); return Status; }
-    // All readable filesystems: no partition, volume-name, vendor or BlockIo requirement.
-    for (UINTN Pass = 0; Pass < 2; Pass++) {
-      for (UINTN Index = 0; Index < Count; Index++) {
-        EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *Fs = NULL;
-        EFI_FILE_PROTOCOL *Root = NULL;
-        Status = gBS->HandleProtocol(Handles[Index], &gEfiSimpleFileSystemProtocolGuid, (VOID **)&Fs);
-        if (EFI_ERROR(Status) || Fs == NULL) continue;
-        Status = Fs->OpenVolume(Fs, &Root);
-        if (EFI_ERROR(Status) || Root == NULL) continue;
-        if (Pass == 0) {
-          J413EfiQueue(Handles[Index], Root, L"\\EFI\\BOOT\\BOOTAA64.EFI");
-          J413EfiQueue(Handles[Index], Root, L"\\EFI\\Microsoft\\Boot\\bootmgfw.efi");
-        } else {
-          UINTN Visited = 0;
-          J413EfiWalk(Handles[Index], Root, Root, L"", 0, &Visited);
-          if (Visited >= J413_EFI_MAX_ENTRIES) Print(L"UEFI EFI: filesystem entry limit reached\r\n");
-        }
-        Root->Close(Root);
-      }
+    // Only the standard ARM64 fallback path, on every readable filesystem.
+    // No Windows Setup dependency gate, BlockIo requirement or recursive scan.
+    for (UINTN Index = 0; Index < Count; Index++) {
+      EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *Fs = NULL;
+      EFI_FILE_PROTOCOL *Root = NULL;
+      CHAR16 Path[J413_EFI_MAX_PATH] = L"\\EFI\\BOOT\\BOOTAA64.EFI";
+      Status = gBS->HandleProtocol(Handles[Index], &gEfiSimpleFileSystemProtocolGuid, (VOID **)&Fs);
+      if (EFI_ERROR(Status) || Fs == NULL) continue;
+      Status = Fs->OpenVolume(Fs, &Root);
+      if (EFI_ERROR(Status) || Root == NULL) continue;
+      J413EfiQueue(Handles[Index], Root, Path);
+      Root->Close(Root);
     }
     if (Handles != NULL) FreePool(Handles);
     if (mEfiCount >= J413_EFI_MAX_CANDIDATES) Print(L"UEFI EFI: candidate limit reached\r\n");
-    Print(L"UEFI EFI: discovered %u ARM64 application candidates\r\n", mEfiCount);
+    Print(L"UEFI EFI: discovered %u BOOTAA64.EFI candidates\r\n", mEfiCount);
   }
   while (mEfiHead != NULL) {
     J413_EFI_CANDIDATE *Item = mEfiHead;
@@ -171,4 +185,5 @@ STATIC EFI_STATUS J413NextEfiOption(EFI_BOOT_MANAGER_LOAD_OPTION *Option) {
   }
   return EFI_NOT_FOUND;
 }
+#endif
 #endif

@@ -1,0 +1,16 @@
+[
+  {
+    "path": ".local/winpe-verification/ntoskrnl.exe",
+    "size": 11582496,
+    "machine": "0xaa64",
+    "subsystem": 1,
+    "sha256": "db0c8b367c1927eb4d39d922cb54da4621e9b3c241e2655d33c5ecd46719aa13"
+  },
+  {
+    "path": ".local/winpe-verification/winload.efi",
+    "size": 3190032,
+    "machine": "0xaa64",
+    "subsystem": 16,
+    "sha256": "fc78840826cf8d0312436bb894282158ef004f8824831b0c0057cef1c8c8a753"
+  }
+]

@@ -123,7 +123,7 @@ Artifact:
 
 Run contract:
 - Launch command: `./scripts/run-assisted.sh --proxy
-  /dev/cu.usbmodemC02HDNCCQ6L41 --vuart /dev/cu.usbmodemC02HDNCCQ6L43
+  <CONSOLE_DEVICE> --vuart <VUART_DEVICE>
   --chainload --m1n1 dist/j313/debug-monitor/m1n1.macho --firmware
   dist/j313/debug-monitor/J313_EFI.fd --display physical --debug monitor
   --foreground`.
@@ -1825,8 +1825,8 @@ Provenance and commands:
   manifest SHA-256
   `c714885a1a5aa52ef598575e68c8274213ecb667dd694908b08d468dc7af3d5d`;
 - launch: `./scripts/run-windows.sh --execution assisted --observed --debug
-  off --proxy /dev/cu.usbmodemC02HDNCCQ6L41 --vuart
-  /dev/cu.usbmodemC02HDNCCQ6L43 --firmware
+  off --proxy <CONSOLE_DEVICE> --vuart
+  <VUART_DEVICE> --firmware
   investigation/artifacts/EXP-20260814-033/J313_EFI.fd --m1n1
   investigation/artifacts/EXP-20260814-033/m1n1.macho --chainload
   --foreground`;
@@ -1998,8 +1998,8 @@ Exact launch command:
 
 ```sh
 ./scripts/run-windows.sh --execution assisted --observed --debug off \
-  --proxy /dev/cu.usbmodemC02HDNCCQ6L41 \
-  --vuart /dev/cu.usbmodemC02HDNCCQ6L43 \
+  --proxy <CONSOLE_DEVICE> \
+  --vuart <VUART_DEVICE> \
   --firmware investigation/artifacts/EXP-20260814-034/J313_EFI.fd \
   --m1n1 investigation/artifacts/EXP-20260814-034/m1n1.macho \
   --chainload --foreground
@@ -2146,8 +2146,8 @@ Exact launch command:
 
 ```sh
 ./scripts/run-windows.sh --execution assisted --observed --debug off \
-  --proxy /dev/cu.usbmodemC02HDNCCQ6L41 \
-  --vuart /dev/cu.usbmodemC02HDNCCQ6L43 \
+  --proxy <CONSOLE_DEVICE> \
+  --vuart <VUART_DEVICE> \
   --firmware investigation/artifacts/EXP-20260814-039/J313_EFI.fd \
   --m1n1 investigation/artifacts/EXP-20260814-039/m1n1.macho \
   --chainload --foreground
@@ -2280,8 +2280,8 @@ Exact launch command:
 
 ```sh
 ./scripts/run-windows.sh --execution assisted --observed --debug monitor \
-  --proxy /dev/cu.usbmodemC02HDNCCQ6L41 \
-  --vuart /dev/cu.usbmodemC02HDNCCQ6L43 \
+  --proxy <CONSOLE_DEVICE> \
+  --vuart <VUART_DEVICE> \
   --firmware investigation/artifacts/EXP-20260814-040/J313_EFI.fd \
   --m1n1 investigation/artifacts/EXP-20260814-040/m1n1.macho \
   --chainload --foreground
@@ -2363,8 +2363,8 @@ Exact launch command:
 
 ```sh
 ./scripts/run-windows.sh --execution assisted --observed --debug monitor \
-  --proxy /dev/cu.usbmodemC02HDNCCQ6L41 \
-  --vuart /dev/cu.usbmodemC02HDNCCQ6L43 \
+  --proxy <CONSOLE_DEVICE> \
+  --vuart <VUART_DEVICE> \
   --firmware investigation/artifacts/EXP-20260814-038/J313_EFI.fd \
   --m1n1 investigation/artifacts/EXP-20260814-038/m1n1.macho \
   --chainload --foreground
@@ -2562,8 +2562,8 @@ Exact launch command:
 
 ```sh
 ./scripts/run-windows.sh --execution assisted --observed --debug monitor \
-  --proxy /dev/cu.usbmodemC02HDNCCQ6L41 \
-  --vuart /dev/cu.usbmodemC02HDNCCQ6L43 \
+  --proxy <CONSOLE_DEVICE> \
+  --vuart <VUART_DEVICE> \
   --firmware investigation/artifacts/EXP-20260814-037/J313_EFI.fd \
   --m1n1 investigation/artifacts/EXP-20260814-037/m1n1.macho \
   --chainload --foreground
@@ -2736,8 +2736,8 @@ Exact launch command:
 
 ```sh
 ./scripts/run-windows.sh --execution assisted --observed --debug off \
-  --proxy /dev/cu.usbmodemC02HDNCCQ6L41 \
-  --vuart /dev/cu.usbmodemC02HDNCCQ6L43 \
+  --proxy <CONSOLE_DEVICE> \
+  --vuart <VUART_DEVICE> \
   --firmware investigation/artifacts/EXP-20260814-035/J313_EFI.fd \
   --m1n1 investigation/artifacts/EXP-20260814-035/m1n1.macho \
   --chainload --foreground
@@ -2879,8 +2879,8 @@ Exact launch command:
 
 ```sh
 ./scripts/run-windows.sh --execution assisted --observed --debug off \
-  --proxy /dev/cu.usbmodemC02HDNCCQ6L41 \
-  --vuart /dev/cu.usbmodemC02HDNCCQ6L43 \
+  --proxy <CONSOLE_DEVICE> \
+  --vuart <VUART_DEVICE> \
   --firmware investigation/artifacts/EXP-20260814-036/J313_EFI.fd \
   --m1n1 investigation/artifacts/EXP-20260814-036/m1n1.macho \
   --chainload --foreground
@@ -2997,8 +2997,8 @@ Recorded artifact before launch (UTC 2026-08-14T18:14:03Z):
 
 ```sh
 ./scripts/run-windows.sh --execution assisted --observed --debug monitor \
-  --proxy /dev/cu.usbmodemC02HDNCCQ6L41 \
-  --vuart /dev/cu.usbmodemC02HDNCCQ6L43 \
+  --proxy <CONSOLE_DEVICE> \
+  --vuart <VUART_DEVICE> \
   --firmware investigation/artifacts/EXP-20260814-041/J313_EFI.fd \
   --m1n1 investigation/artifacts/EXP-20260814-041/m1n1.macho \
   --chainload --foreground
@@ -3150,8 +3150,8 @@ Recorded artifact before launch (UTC 2026-08-14T18:29:03Z):
 
 ```sh
 ./scripts/run-windows.sh --execution assisted --observed --debug monitor \
-  --proxy /dev/cu.usbmodemC02HDNCCQ6L41 \
-  --vuart /dev/cu.usbmodemC02HDNCCQ6L43 \
+  --proxy <CONSOLE_DEVICE> \
+  --vuart <VUART_DEVICE> \
   --firmware investigation/artifacts/EXP-20260814-042/J313_EFI.fd \
   --m1n1 investigation/artifacts/EXP-20260814-042/m1n1.macho \
   --chainload --foreground
@@ -3289,8 +3289,8 @@ Exact launch command:
 
 ```sh
 ./scripts/run-windows.sh --execution assisted --observed --debug monitor \
-  --proxy /dev/cu.usbmodemC02HDNCCQ6L41 \
-  --vuart /dev/cu.usbmodemC02HDNCCQ6L43 \
+  --proxy <CONSOLE_DEVICE> \
+  --vuart <VUART_DEVICE> \
   --firmware investigation/artifacts/EXP-20260814-043/J313_EFI.fd \
   --m1n1 investigation/artifacts/EXP-20260814-043/m1n1.macho \
   --chainload --foreground
@@ -3399,8 +3399,8 @@ Exact launch command:
 
 ```sh
 /private/tmp/wom1-root-5d827ba.WCgcVM/scripts/run-assisted.sh \
-  --proxy /dev/cu.usbmodemC02HDNCCQ6L41 \
-  --vuart /dev/cu.usbmodemC02HDNCCQ6L43 \
+  --proxy <CONSOLE_DEVICE> \
+  --vuart <VUART_DEVICE> \
   --firmware /Users/pavel/public_windows/investigation/artifacts/EXP-20260814-044/J313_EFI.fd \
   --display both --debug monitor --chainload \
   --m1n1 /Users/pavel/public_windows/investigation/artifacts/EXP-20260814-044/m1n1.macho \
@@ -3654,8 +3654,8 @@ Artifacts:
 Exact launch command:
 
 ```sh
-scripts/run-assisted.sh --proxy /dev/cu.usbmodemC02HDNCCQ6L41 \
-  --vuart /dev/cu.usbmodemC02HDNCCQ6L43 \
+scripts/run-assisted.sh --proxy <CONSOLE_DEVICE> \
+  --vuart <VUART_DEVICE> \
   --firmware investigation/artifacts/EXP-20260814-046/J313_EFI.fd \
   --m1n1 investigation/artifacts/EXP-20260814-046/m1n1.macho \
   --display both --debug monitor --chainload --foreground
@@ -4022,7 +4022,7 @@ Frozen rejection evidence:
 The exact runner PID 48046 received SIGTERM only after the evidence was frozen.
 The Air was then explicitly rebooted through the sole proxy owner; both USB
 ports re-enumerated and the role probe confirmed the clean Stage 1 proxy on
-`/dev/cu.usbmodemC02HDNCCQ6L41` with vUART on the `...43` port.
+`<CONSOLE_DEVICE>` with vUART on the `...43` port.
 
 ### EXP-20260814-050 — preserve guest WFE as a native synchronization primitive
 
@@ -5011,8 +5011,8 @@ physical and USB framebuffer consumers enabled.
   and `dist/j313/debug-forensic/J313_EFI.fd`, SHA-256
   `8d95d77664346ceb95bbe7a1fca493cc1b1e876fc1acf627c385191fe4df268a`.
 - launch command: `scripts/run-windows.sh --execution assisted --display both
-  --debug full --observed --proxy /dev/cu.usbmodemC02HDNCCQ6L41 --vuart
-  /dev/cu.usbmodemC02HDNCCQ6L43`.
+  --debug full --observed --proxy <CONSOLE_DEVICE> --vuart
+  <VUART_DEVICE>`.
 - recovery: no ESP write; reboot returns to the installed stable image.
   `oem9.inf` remains the confirmed AppleInput rollback package.
 - expected checkpoint: explicit `Starting guest...`, live internal and web
@@ -5049,7 +5049,7 @@ The fresh proxy passed `probe.py` before launch.
 
 Launch command: `scripts/run-windows.sh --execution assisted --display both
 --debug full --observed --foreground --proxy
-/dev/cu.usbmodemC02HDNCCQ6L41 --vuart /dev/cu.usbmodemC02HDNCCQ6L43`.
+<CONSOLE_DEVICE> --vuart <VUART_DEVICE>`.
 The stable ESP remains untouched and `oem9.inf` remains the input-driver
 rollback.  Expected checkpoint and evidence paths are identical to
 EXP-20260824-043; failure additionally includes loss of the persistent runner
@@ -5082,7 +5082,7 @@ and the previously validated root build state from EXP-057.
 
 Launch command: `scripts/run-windows.sh --execution assisted --display both
 --debug monitor --observed --foreground --proxy
-/dev/cu.usbmodemC02HDNCCQ6L41 --vuart /dev/cu.usbmodemC02HDNCCQ6L43`.
+<CONSOLE_DEVICE> --vuart <VUART_DEVICE>`.
 Driver candidate hashes are those recorded for CI run 32677640457 immediately
 above; installation is forbidden until the live APPL0001 node and `oem9.inf`
 rollback state are re-confirmed.  The stable ESP remains untouched.  Pass:
@@ -5219,7 +5219,7 @@ snapshots and keep VHF absent because the package default is
   approval before installation.
 - launch command: `scripts/run-windows.sh --execution assisted --display both
   --debug monitor --observed --foreground --proxy
-  /dev/cu.usbmodemC02HDNCCQ6L41 --vuart /dev/cu.usbmodemC02HDNCCQ6L43`.
+  <CONSOLE_DEVICE> --vuart <VUART_DEVICE>`.
 - install contract: use the package installer without `-PublishKeyboard`, then
   confirm `TransportOnly=1`; `oem12.inf`, external USB input and the unchanged
   stable ESP remain the recovery paths.
@@ -6062,8 +6062,8 @@ USB, display or ESP behavior changes.
   `e4c073c28d2d008aa0159cf3e64f5daa2afabe0bb712b68198ea8d917381a3a6`.
   Exact launch command is `scripts/run-windows.sh --execution assisted
   --display both --debug full --observed --proxy
-  /dev/cu.usbmodemC02HDNCCQ6L41 --vuart
-  /dev/cu.usbmodemC02HDNCCQ6L43` from the current proxy-ready state.
+  <CONSOLE_DEVICE> --vuart
+  <VUART_DEVICE>` from the current proxy-ready state.
 - recovery artifact remains installed Windows package `oem15.inf` with active
   SYS SHA-256
   `65a3d0c4e169abb411712e18658405322a96b2b5dcba85966a53ffa5d16f1ef1`.
@@ -6697,9 +6697,9 @@ any other platform behavior.
   published checkpoint, with no ESP write;
 - build command: `scripts/build-standalone.sh --debug-build --display both
   --debug monitor`;
-- launch command: `M1N1DEVICE=/dev/cu.usbmodemC02HDNCCQ6L41
-  M1N1VUART=/dev/cu.usbmodemC02HDNCCQ6L43 scripts/run-assisted.sh --proxy
-  /dev/cu.usbmodemC02HDNCCQ6L41 --vuart /dev/cu.usbmodemC02HDNCCQ6L43
+- launch command: `M1N1DEVICE=<CONSOLE_DEVICE>
+  M1N1VUART=<VUART_DEVICE> scripts/run-assisted.sh --proxy
+  <CONSOLE_DEVICE> --vuart <VUART_DEVICE>
   --display both --debug monitor --chainload --foreground`;
 - evidence paths: `hv.log`, `fb.raw`, `fb-info.json`, Windows System event log,
   `/tmp/cpuset-exp070.ps1`, `/tmp/cpu-stress-exp071.ps1`, and
@@ -6771,9 +6771,9 @@ cores without changing any other platform contract.
   published checkpoint and only the recorded root/Mu experiment diffs dirty;
 - planned build: `scripts/build-standalone.sh --debug-build --display both
   --debug monitor`;
-- planned launch: `M1N1DEVICE=/dev/cu.usbmodemC02HDNCCQ6L41
-  M1N1VUART=/dev/cu.usbmodemC02HDNCCQ6L43 scripts/run-assisted.sh --proxy
-  /dev/cu.usbmodemC02HDNCCQ6L41 --vuart /dev/cu.usbmodemC02HDNCCQ6L43
+- planned launch: `M1N1DEVICE=<CONSOLE_DEVICE>
+  M1N1VUART=<VUART_DEVICE> scripts/run-assisted.sh --proxy
+  <CONSOLE_DEVICE> --vuart <VUART_DEVICE>
   --display both --debug monitor --chainload --foreground`;
 - expected checkpoint: Windows reaches the lock screen within 30 seconds,
   reports eight logical CPUs, and classifies UIDs 4 through 7 as P-class;
@@ -7490,3 +7490,146 @@ After software run 2026-10-12T11:30:19.245471+00:00: 364 tests, 362 passed/two e
 Before software run 2026-10-12T11:31:54.523444+00:00: user explicitly requests boot from EFI files regardless of vendor, path or filesystem location. Main 8102e0fd6c92ee94ee7c4034064efa30119e3bd9; pins unchanged. Recovery .local/boot-before-efi-discovery. Sources: UEFI 2.10 media file Open/Read/SetPosition/directory-entry contract and ARM64 PE32+ application definition; pinned FileInfo.h, FileProtocol, Mu standard BDS EfiBootManagerBoot and MsPlatform priority flow, current selector and targeted USB helper. New owning selection policy: complete Setup remains first preference, then standard fallback/Windows loader paths across all readable SimpleFS handles and recursive case-insensitive .efi search anywhere, without BlockIo/partition/name/vendor filtering. Preflight ARM64 PE32+ EFI applications only, normal BDS full validation/security and ReadyToBoot unchanged. Returned/failed apps advance without persistent BootOrder writes. Bounds: 32 directory levels, 1024 path chars, 100000 directory entries per filesystem, 256 applications; report limit hits, no unbounded rescans or repeated candidate. No arbitrary EFI driver starts or unsupported CPU emulation. No new hardware MMIO sequencing; USB aperture fix retained. Expected actual scanner/selector/BDS-loop sanitizer regressions, full suite and native build/source manifests. Physical EFI application/Windows success not claimed. No ESP install/partition/security change or reboot.
 
 After software run 2026-10-12T11:38:16.064606+00:00: 366 tests, 364 passed/two expected skips. Actual scanner/header and BDS-loop execute under fatal ASan/UBSan: preferred and arbitrary nested/root paths across two filesystems; case/dedup; x64 and EFI-driver rejection; malformed record and grown buffer; read/path/option failures; all closes/frees; failed/success/security-status application returns each advance once through standard EfiBootManagerBoot. Actual selector keeps complete Setup preference then generic fallback without repeated USB connection. Initial test harness unused counters/obsolete failure expectations corrected before final suite. Native Mu succeeds, 98 EFI images validated plus linked PrePi. Normal native full source provenance checked, unchanged m1n1 source digest/artifact bytes verified before fresh FD repack; exact image SHA/size/profile/nested CRC and noProxy flags verified. Identity {"artifacts": {"J413_EFI.fd": {"role": "guest-firmware", "sha256": "bd0b67ee1c9e917584e86426c82cd285b2ccb153920b9ff256e8abce7747a859", "size": 30965760}, "TOOLCHAINS.json": {"sha256": "baf2dd449fd89d3a6dea65502898e0755bbca18e716daa3a237411b440500172", "size": 160}, "boot.bin": {"role": "standalone-bootstrap", "sha256": "9fed3c1969eceb9b292f88dd13e657700ebb11c44016b3e35e87ed4853922231", "size": 2539228}, "m1n1-stage0.bin": {"role": "autonomous-stage0", "sha256": "57e00fa6f52f9ac8a25ffa6a2267b37f83b9b3d1de21f61232b307bbfe3f8b22", "size": 1310720}, "m1n1-stage1.bin": {"role": "autonomous-stage1", "sha256": "376d5ba692b30cab2de2ba228821fb85628c520989096311bccff45347352419", "size": 1310720}}, "overlay": "8211e1525c86b9a68d22871aa2032478342351c6e9c78cf08057ca6a8e48fb22"}. Implementation 21b346cc67c496932c7e0a44fedac3469bdd34c4. Hash-verified bundle /Volumes/Untitled 2/windows-on-m2-workspace/uefi-efi-discovery-f34a8pfr contains 21 candidate/recovery/source/EfiFs notice copies; volume matched UUID, no disk-number assumption. Verdict implemented, no physical attempt of this image; generic EFI handoff, SSD and kernel remain unqualified. Complete Setup loader still preferred; generic candidates need ARM64 application format, not Windows media dependencies. Bounded directory/path/entry/candidate limits documented and reported. Existing input limitations unchanged. No ESP install/partition/security write/reboot.
+
+
+## EXP-20261104-J413-032 — user-supplied photo and exact fallback policy
+
+Recorded retrospectively from operator-provided IMG_6311.HEIC; no pre-run identity/timing was available and this is not an agent-initiated hardware trial. Photo SHA256 168b212426a30744ac1a728d92a60ab21b0e2828f9d92d3b85de1df5c2efc81d. Controller registration/connect Success, DART readiness Success/mask 0x2, incomplete examined filesystem, then ACPIVIEW.EFI selected/attempted. Windows stop code/parameters, all CPUs, IRQ/timer, storage and input liveness unobserved; firmware display alive. Verdict: general EFI selection confirmed; USB media and Windows startup inconclusive. Corrects the untested EXP031 policy at the user request; does not reinterpret its old result.
+
+Before software verification 2026-11-04T16:09:44.079832+00:00: root master 73884963694696ab3d80e9e6baafa7112cd6b299, pinned Mu/m1n1 retained with existing dirty overlays. Exact-path selector change only; test command python3 -m unittest discover -s tests. Source plan and ownership: investigation/analysis/2026-11-04-exact-boot-usb-gpu.md. No firmware build/install/launch yet; no new artifact or hardware result. Hardware hypothesis: exact fallback policy cannot choose ACPIVIEW. Recovery untouched.
+
+
+## EXP-20261104-J413-033 — exact-path firmware with USB boundary inventory
+
+Before build 2026-11-04T16:11:40.095447+00:00: source identity/diff hashes in investigation/analysis/2026-11-04-build-source-state.json. Independent observables: exact-path policy from EXP032 plus explicitly read-only protocol diagnostics; no attempt at physical attribution between these changes. Hypothesis: candidate selects only BOOTAA64.EFI and reports USB host/interfaces/block/filesystem device paths after existing binding. Command: scripts/build-j413-boot-experiment.sh > /tmp/m2-build-20261104.log 2>&1 ; output dist/j413/boot-experiment, physical/debug-off/M1N1_NO_PROXY, profile debug. Prior local artifacts preserved at .local/recovery-20261104-exact-boot with SHA256.json; they are recovery candidates, not newly validated known-good images. No install/launch command executed. Expected checkpoint: build/manifests validate; physical checkpoint deferred. Failure criterion: compile/manifest mismatch. Full suite returned 1558 tests: 91 failures/56 errors/42 skips, including unchanged GPU contracts and missing external source dependencies; details preserved in analysis test log. Focused exact loader tests passed under sanitizers.
+
+After software run 2026-11-04T16:14:39.418292+00:00, EXP-20261104-J413-032/033: build succeeded, Mu 98 EFI images verified and linked PrePi guard checked; both m1n1 stages built and nested physical/debug-off image/profile/manifests verified. Exact overlay SHA256 5497cc49120052b842bba51b95a437a5546f48dbb7624c458e6a8edd156e227f matches current sources. boot.bin SHA256 8ddc181829347c35c068ef974c5f904405ed9c742bc1a9f5b368f443581d6578 size 2538572; J413_EFI.fd SHA256 847c7acaf9cf05864ff68477d3cb91cca974bcfd0fac8d8ba18e5e8dfb102e18 size 30965760; manifest dist/j413/boot-experiment/MANIFEST.json. Final J413 suite 44 tests/43 passed/one skipped; ledger two passed. Full checkout failures and errors recorded in analysis/2026-11-04-test-results.json and full log; cannot claim global green or driver qualification. Firmware logs in analysis/2026-11-04-build.log. No observed physical phases/times, Windows stop, CPU/IRQ/timer or display/USB input/SSH/RDP/storage liveness for this new candidate; none launched. Verdict: software implementation verified; hardware hypothesis inconclusive. Recovery local bytes preserved under .local/recovery-20261104-exact-boot with SHA256.json; no ESP/partition/boot-policy/USB-media changes. Next justified experiment: record installed exact hash and recovery, then observe USB protocol paths and exact loader selection before GPU work. GPU runtime blocked by documented ACPI/driver/IRQ contract differences.
+
+
+## EXP-20261104-J413-034 — USB discovery audit after operator not-found report
+
+Before read-only diagnostic 2026-11-04T16:37:15.884675+00:00: operator reports only EFI not found; no exact final trace, installed hash or elapsed time provided. Source IDs/diff hashes: investigation/analysis/2026-11-04-usb-audit-state.json. Hypothesis to distinguish: macOS sees valid USB media but firmware host/child/filesystem binding or selection fails. Commands: python3 tools/collect_j413.py --output investigation/analysis/2026-11-04-j413-live-resources.json ; system_profiler SPUSBDataType -json (sanitize to topology/speed/name only) ; python3 tools/check_j413_setup.py /Volumes/WININSTALL ; inspect existing local logs and manifests only. No direct MMIO reads or physical register writes, no mount repair, install, power/reset or launch. Existing candidate dist/j413/boot-experiment/boot.bin SHA256 8ddc181829347c35c068ef974c5f904405ed9c742bc1a9f5b368f443581d6578; manifest same directory, debug/physical/off. Recovery .local/recovery-20261104-exact-boot. Evidence paths analysis/2026-11-04-* ; expected checkpoint: fresh translated USB/DART/IRQ and current media contract, not firmware USB runtime proof.
+
+After read-only diagnostic 2026-11-04T16:47:53.751600+00:00, EXP-20261104-J413-034: fresh ADT capture reproduces USB1 0x502280000/0x11800 IRQ1112 and USB0 0x382280000/0x11800 IRQ1031; DART banks/IRQs recorded. Current macOS ancestry places SanDisk on usb-drd0. system_profiler returned empty USB inventory; IORegistry is the actual ancestry evidence. WININSTALL four headers valid; installed ESP identity unavailable because sudo noninteractive read-only mount required a password, no mount/repair performed. No firmware register sampling or reboot. Verdict: current port0 exclusion confirmed; does not establish the port used in the prior trial.
+
+Operator update 2026-11-04T16:47:53.751600+00:00: IMG_6312.HEIC SHA256 e34d91d5a0ba5b02c40f1306107502afa138e5c2eb6ea0928ff9f1df521c91b0. User explicitly moved media to usb-drd1. Photo shows host-controller protocol present (one), DART Success/mask0x2, zero UsbIo interfaces, one VirtualDisk BlockIo/SimpleFS, zero BOOTAA64 candidates. This supersedes any inference that changing to USB1 alone fixes discovery. Driver-binding success is confirmed; no physical USB child/storage or Windows launch shown. Installed SHA and elapsed time unmeasured; strings match EXP033 candidate. No Windows stop code/parameters, CPU/timer/IRQ counters, SSH/RDP/input liveness available. Display alive. Next checkpoint must be physical child enumeration/port-state, before filesystem policy.
+
+
+## EXP-20261104-J413-035 — match USB1 PHY role to preboot xHCI host
+
+Before software build 2026-11-04T16:49:47.427294+00:00: source IDs and diff hashes analysis/2026-11-04-usb1-role-build-state.json; plan analysis/2026-11-04-usb1-phy-role-plan.md. Hypothesis: missing external USB2 PHY host bits prevent USB1 child enumeration despite bound xHCI in IMG_6312. Single functional variable: initial PHY role bits, USB1 in J413+M1N1_NO_PROXY only; add non-destructive SIG readback diagnostic. No changes to PHY reset/power/delay, DWC3 core, DART, ACPI, IRQs, discovery policy or Windows drivers. Regression against old actual initializer failed the first SIG-value assertion; new function passes role/profile/order/failure cases under ASan/UBSan. Build command J413_SKIP_MU=1 scripts/build-j413-boot-experiment.sh > /tmp/m2-usb1-role-build.log 2>&1 ; output dist/j413/boot-experiment, profile debug/physical/off and both no-proxy stages. Mu SHA remains 847c7acaf9cf05864ff68477d3cb91cca974bcfd0fac8d8ba18e5e8dfb102e18. Previous candidate SHA 8ddc181829347c35c068ef974c5f904405ed9c742bc1a9f5b368f443581d6578 preserved under .local/recovery-20261104-before-usb1-role with RECOVERY_HASHES.json. Current actual installed ESP could not be read without operator sudo; macOS remains recovery. No install/launch command executed. Expected software checkpoint: matching source/nested/profile manifests. Hardware checkpoint pending: SIG host mask readback, UsbIo count nonzero then USB storage and exact BOOTAA64 loader. Failure criterion: host present but still zero children; collect root-port/PHY state before changing another variable.
+
+After software build 2026-11-04T16:53:59.018514+00:00, EXP-20261104-J413-035: success. Both m1n1 ARM64 stages rebuilt. boot.bin 2538660 bytes SHA256 910192421b2292b9a8b7531d645295a52e6bb36c5c5a5878c9ddb6cd93f1f4a9; manifest dist/j413/boot-experiment/MANIFEST.json, debug qualification/physical/debug-off; outer and inner profile/CRC, exact image identity, current m1n1 source digest verified. Mu unchanged at SHA256 847c7acaf9cf05864ff68477d3cb91cca974bcfd0fac8d8ba18e5e8dfb102e18. 46 J413 tests: 45 pass/one skip; full suite 1561 tests, 91 failures/55 errors/42 skips, no new failure headers compared with earlier baseline; ledger two tests pass. Logs and results under analysis/2026-11-04-usb1-role*. No new hardware phases/time, stop code/params, CPU/IRQ/timer or USB input/storage/SSH/RDP liveness measured; no launch. Display evidence remains IMG_6312 from prior image. Verdict: implemented and software-verified; causal hardware hypothesis inconclusive. Recovery candidate .local/recovery-20261104-before-usb1-role retains previous manifested bytes; no ESP or USB-media write. Next operator checkpoint: exact installed hash, new PHY SIG readback then nonzero UsbIo and physical filesystem path; do not call this a working boot until observed.
+
+
+## EXP-20261104-J413-036 — prepare a pinned install/rollback script
+
+Prepared 2026-11-04T17:00:06.378180+00:00: user explicitly requests an installation script with every build. No hardware installation initiated. Owning sources inspected: scripts/install-esp.sh (current local copy includes automatic fsck), tools/verify_install_image.py, tools/artifact_manifest.py, current MANIFEST.json and live diskutil UUID metadata. Workflow plan: independent installer scripts/install-j413-usb1-phy.py, pinned to boot.bin SHA256 910192421b2292b9a8b7531d645295a52e6bb36c5c5a5878c9ddb6cd93f1f4a9 and recorded internal Asahi ESP PARTUUID 3953DFAE-A571-42D9-9FC7-F962BC4CE923; resolve device by UUID, verify image before mount, preserve and verify fresh backup, stage/verify/rename atomically, print checked rollback command. Existing modified installer remains untouched. Actual installs/restores append before/backup/after entries automatically with commits/diff hashes, command, artifact identity and recovery bytes; never infer a guest boot. No firmware/IRQ/DMA/power/platform changes.
+
+After software verification: seven simulated-ESP tests and three image-identity tests passed. Backup/rename failure keeps original bytes, temporary payload is cleaned, wrong UUID and tampered recovery are rejected, rollback restores exact prior bytes, dry run has no mount or filesystem mutation. Live --dry-run passed under both default Python and /usr/bin/python3 and resolved current disk0s4 by UUID; this was metadata/artifact inspection only. Verdict implemented; no ESP/USB-media write, repair, reboot or runtime validation. Candidate and manifest remain unchanged from EXP035. Next actual command, if operator chooses: sudo /usr/bin/python3 scripts/install-j413-usb1-phy.py ; installation will create its own unique experiment entry and recovery directory.
+
+
+## EXP-20261104T170037Z-J413-ESP-0ec4f438 — install J413 payload
+
+Before 2026-11-04T17:00:37.913297+00:00: target disk0s4, PARTUUID 3953DFAE-A571-42D9-9FC7-F962BC4CE923; source /Users/liamsitbon/Pictures/gemini/windows-on-m2-air-main/dist/j413/boot-experiment/boot.bin; SHA256 910192421b2292b9a8b7531d645295a52e6bb36c5c5a5878c9ddb6cd93f1f4a9; source state {"Mu": {"branch": "", "commit": "8b4dc4b4e3ff8606d0af36163acf9de79b7b4737", "diff_sha256": "909433ee62241c9d784b01188b1f79dc1bbd43c007759f38f65df230f9de2cf1"}, "m1n1": {"branch": "", "commit": "9cd80ac652ac404e92ae279deeaec8c629d7d184", "diff_sha256": "c21fa5b54fdd085ed09614abdef38fc86697c9a5efc13949a420c9928b8ee6a8"}, "root": {"branch": "master", "commit": "3f47900686aaa16721c12d6af418ae9b1d97dc1b", "diff_sha256": "ae9df3a12b54a257bdcbbca3f4d3e381d03f3a72553d3e80b63d54d7ce9b7948"}}. Command /Users/liamsitbon/Pictures/gemini/windows-on-m2-air-main/scripts/install-j413-usb1-phy.py. Recovery destination /Users/liamsitbon/Pictures/gemini/windows-on-m2-air-main/.local/esp-installs/EXP-20261104T170037Z-J413-ESP-0ec4f438/boot.bin.before. Expected checkpoint: verified atomic payload replacement only; no guest launch. Failure criterion: target, mount, backup, copy or hash verification fails. Evidence: this entry and backup directory; no format, repair, boot-policy change or reboot.
+
+Before replacement EXP-20261104T170037Z-J413-ESP-0ec4f438: recovery /Users/liamsitbon/Pictures/gemini/windows-on-m2-air-main/.local/esp-installs/EXP-20261104T170037Z-J413-ESP-0ec4f438/boot.bin.before, SHA256 8ddc181829347c35c068ef974c5f904405ed9c742bc1a9f5b368f443581d6578; backup verified. Existing bootability is not newly qualified; macOS startup picker remains recovery.
+
+After 2026-11-04T17:00:38.812081+00:00, EXP-20261104T170037Z-J413-ESP-0ec4f438: installed /Volumes/EFI - UEFI/m1n1/boot.bin, SHA256 910192421b2292b9a8b7531d645295a52e6bb36c5c5a5878c9ddb6cd93f1f4a9; byte verification passed. Verdict: installed; boot/USB/Windows result inconclusive. No boot phases, Windows stop/parameters, CPU/IRQ/timer or display/input/storage/SSH/RDP liveness measured; no reboot or launch. Next checkpoint: operator records this exact image boot and USB1 PHY/child enumeration.
+
+
+## EXP-20261104-J413-037 — operator cold-boot checkpoint after verified install
+
+Before operator run 2026-11-04T17:03:21.511301+00:00: user reports executing installer and asks whether to reboot. Independent read of /Volumes/EFI - UEFI/m1n1/boot.bin confirms SHA256 910192421b2292b9a8b7531d645295a52e6bb36c5c5a5878c9ddb6cd93f1f4a9; disk0s4 PARTUUID 3953DFAE-A571-42D9-9FC7-F962BC4CE923. Manifest dist/j413/boot-experiment/MANIFEST.json, debug qualification, physical display/debug-off/both M1N1_NO_PROXY stages. Source state {"Mu": {"commit": "8b4dc4b4e3ff8606d0af36163acf9de79b7b4737", "diff_sha256": "909433ee62241c9d784b01188b1f79dc1bbd43c007759f38f65df230f9de2cf1"}, "m1n1": {"commit": "9cd80ac652ac404e92ae279deeaec8c629d7d184", "diff_sha256": "c21fa5b54fdd085ed09614abdef38fc86697c9a5efc13949a420c9928b8ee6a8"}, "root": {"commit": "3f47900686aaa16721c12d6af418ae9b1d97dc1b", "diff_sha256": "929e0a583569eb541ade71dc7b2ca04c09e482a5941ad119439b5697f757c11e"}}. Build command from EXP035: J413_SKIP_MU=1 scripts/build-j413-boot-experiment.sh. Install command and before/after transaction: EXP-20261104T170037Z-J413-ESP-0ec4f438. Installer recorded verified backup .local/esp-installs/EXP-20261104T170037Z-J413-ESP-0ec4f438/boot.bin.before, SHA256 8ddc181829347c35c068ef974c5f904405ed9c742bc1a9f5b368f443581d6578; backup directory root-only, not independently reopened by this user-level process. Recovery command printed by installer; macOS startup picker remains available.
+
+Hypothesis: USB1 external PHY host role correction permits child enumeration. Single functional variable relative to IMG_6312 candidate is initial USB1 PHY SIG host bits; Mu and other hardware setup unchanged. Intended launch: operator saves work, shuts down fully, connects installer to tested USB1, holds power for Startup Options and selects UEFI boot. No agent reboot command. Expected first checkpoint: USB1 host PHY requested/readback=0x1c1700f; then USB interfaces nonzero and physical USB storage filesystem, followed by EFI/BOOT/BOOTAA64.EFI. Failure: mismatch/readback failure, zero USB children, missing storage/loader, hang/reset or Windows stop. Capture photo/video of PHY and USB inventory plus last screen; record elapsed time and any stop parameters. Verdict pending, no launch outcome yet. Do not equate successful ESP write with working USB or Windows.
+
+After operator run 2026-11-04T17:14:08.826093+00:00, EXP-20261104-J413-037: user reports EFI not found again and supplies IMG_6313.HEIC SHA256 31b82919ed3210af8a0172ea62389d7d4851ed4f07d36350a4e97cf34b761b93. Photo shows UEFI Shell mappings for firmware memory, VirtualDisk and internal NVMe partitions; no USB device path/filesystem shown. Early PHY/USB inventory not captured. Pre-run installed hash was independently verified; no post-run hash yet. No Windows stop/parameters or CPU/IRQ/timer/USB input/storage/SSH/RDP liveness measurement. Display and Shell alive; internal storage appears mapped. Verdict: PHY role change alone did not deliver the requested USB boot in this run; the early readback and exact child/port failure remain inconclusive. Do not silently call EXP035 a working USB fix. Next justified step: inspect the connected device and snapshot the controller/PHY/port state without changing another power/reset variable.
+
+
+## EXP-20261104-J413-038 — inspect USB1 media and hardware-state measurement plan
+
+Before read-only diagnostics 2026-11-04T17:14:08.828234+00:00: inspect current USB1 IORegistry ancestry/descriptors, disk metadata, four Setup payloads and WIM integrity; read existing optional logs. No direct macOS MMIO access, mounted-media writes, repair, reset, ESP install or reboot. Firmware probe design follows current primary source before adding any hardware-changing workaround. Candidate/recovery identities remain EXP035 and EXP-20261104T170037Z-J413-ESP-0ec4f438.
+
+
+After read-only inspection, EXP-20261104-J413-038: prior-turn descriptor capture is analysis/2026-11-04-usb1-current-descriptors.json. SanDisk was at 480Mb/s on USB1 with SCSI Bulk-Only interface; WININSTALL fallback and payloads checked, boot.wim verification reported success. The temporary WIM verifier log is no longer present in the resumed environment; no fresh integrity verification is inferred. No media write or firmware launch. Verdict: valid media layout on WININSTALL at that inspection; M2BOOT lacks boot.wim/boot.sdi. Firmware enumeration remains unresolved.
+
+
+## EXP-20261105-J413-039 — bounded discovery and case-insensitive fallback resolution
+
+Before software verification 2026-11-05T11:51:48.693275+00:00: source IDs and dirty diff hashes in analysis/2026-11-05-usb-discovery-source-state.json. Root master; pinned Mu and m1n1 retained. Primary sources and ownership in analysis/2026-11-04-usb-discovery-plan.md with current addendum to follow. Functional variable: discovery policy only (bounded asynchronous publication window and exact component matching). Hardware reset/power/DMA/IRQ/PHY writes unchanged. Hypothesis: a later SimpleFS and mixed-case standard ARM64 fallback are selected; arbitrary names and wrong architectures remain rejected. Command python3 -m unittest discover -s tests -p test_j413*.py . Old mixed-case regression fails on prior source; new actual C passes under sanitizers. Current hardware inspection shows hubs only, no external disk, as captured in analysis/2026-11-05-current-usb.json. No install or launch; existing EXP035 candidate and recovery remain unchanged. Physical USB enumeration success is not inferred.
+
+
+After software verification 2026-11-05T11:59:39.934431+00:00, EXP-20261105-J413-039: 57 focused tests, 56 pass/one skipped. Actual delayed filesystem scanner, mixed-case exact path, malformed records and wrong PE architecture/subsystem, timer failure cleanup and bounded read-only probes passed ASan/UBSan. New source commits 8bf40f448858b6ae35750f0b25a00bf1c1db4de2 and 0f1bc5b; no hardware launch or install. Verdict implemented; hardware causality inconclusive.
+
+
+## EXP-20261105-J413-040 — build bounded ARM64 USB discovery candidate
+
+Before build 2026-11-05T11:59:39.934431+00:00: identities and dirty diffs analysis/2026-11-05-usb-build-source-state.json; plan analysis/2026-11-05-usb-boot-plan.md. Single functional firmware variable: loader discovery policy; read-only diagnostic overhead explicitly recorded. Command scripts/build-j413-boot-experiment.sh > investigation/analysis/2026-11-05-usb-build.log 2>&1 . Output dist/j413/boot-experiment, debug qualification/physical/debug-off, both stages no-proxy. New SHA pending build and mandatory before any install. Prior boot.bin SHA 910192421b2292b9a8b7531d645295a52e6bb36c5c5a5878c9ddb6cd93f1f4a9 and full manifested candidate copied to .local/recovery-20261105-before-discovery with RECOVERY_HASHES.json; this is a recovery candidate, not hardware-validated Windows. Previously installed bytes and backup remain EXP037. Expected checkpoint: complete Mu/two-stage build, source/nested/CRC/manifest validation. Failure criterion: compile/contract/manifest mismatch. No launch/install/reboot initiated. Hardware checkpoint deferred to physical USB child/filesystem/selection and resulting Windows phase.
+
+
+## EXP-20261105T120605Z-USB-MEDIA-d9d9cb60 — complete FAT WinPE payloads
+
+Before 2026-11-05T12:06:06.059922+00:00: command scripts/complete-j413-usb-media.py; source /Volumes/WININSTALL UUID 6EF78F22-8A6D-454C-880E-1DDD706CADE4; target /Volumes/M2BOOT UUID D0E51975-0AE3-45C5-8EE0-85C51B0FCC78; root branch master; source state {"Mu": {"branch": "", "commit": "8b4dc4b4e3ff8606d0af36163acf9de79b7b4737", "diff_sha256": "5be9691f92479414347b9e30a257d130cc530825a9b13b2c13a33db769aa7321"}, "m1n1": {"branch": "", "commit": "9cd80ac652ac404e92ae279deeaec8c629d7d184", "diff_sha256": "c21fa5b54fdd085ed09614abdef38fc86697c9a5efc13949a420c9928b8ee6a8"}, "root": {"branch": "master", "commit": "4e6dff47bd2493e7309651a88964f13a25a3b4fe", "diff_sha256": "9b981d5ad6c4271725aabb2582fc9b365a664906f59ee68cb136f856bb31bd0b"}}; manifest/recovery record /Users/liamsitbon/Pictures/gemini/windows-on-m2-air-main/.local/usb-media/EXP-20261105T120605Z-USB-MEDIA-d9d9cb60/MANIFEST.json; SHA256 0c5dd2a3e625315629270ee5eb5a1fd33dea5754b8a9118e3b5c98e38cb91961; payload hashes {"boot/boot.sdi": "cd2c00ce027687ce4a8bdc967f26a8ab82f651c9becd703658ba282ec49702bd", "efi/boot/bootaa64.efi": "fae47d78487e781aa06466775cb461adeb7ff7f887fe2c15295bb2eb4f4954e1", "efi/microsoft/boot/bcd": "b90ef16b94c3dda7d76cc39840befaa9786887517445c3b6f47ebc806d0ab105", "sources/boot.wim": "dcf58a3d6be5d8747ba8b475f6bbc3782a53bc5dc14c7b11e73ff140deeab534"}. Hypothesis: adding only missing ['sources/boot.wim', 'boot/boot.sdi'] completes the FAT partition WinPE relative paths. Existing loader/BCD and all firmware/partitions unchanged. Expected checkpoint: matching destination hashes and four valid headers; no firmware launch.
+
+After 2026-11-05T12:07:58.484485+00:00, EXP-20261105T120605Z-USB-MEDIA-d9d9cb60: verified ['sources/boot.wim', 'boot/boot.sdi']; four boot headers valid; verdict implemented, physical boot inconclusive. No boot phases, stop code, CPU/IRQ/timer, USB input/SSH/RDP/storage liveness measured; no reboot.
+
+
+After software build/verification 2026-11-05T12:16:22.931135+00:00, EXP-20261105-J413-040: full ARM64 Mu and two m1n1 stages built; image 817b006fb1f5c9c23140dba3410ca2a6caa01fa0b3c73bb590324682289cc4ed size 2541096; Mu 41d910d08439e5fd0c902af4d9164675f25ddabd4d3f6d0482e572c3ed9daa8f size 30965760; manifest dist/j413/boot-experiment/MANIFEST.json, debug qualification/physical/off, both no-proxy stages. Current overlay/source digests, nested launch/CRC and image identity verified. Latest focused suite 69 tests, 68 pass/one skipped. Full run 1583 tests in 128.509s has 91 failures/55 errors/42 skips; failure-header set exactly matches previous 1561-test run, recorded in analysis/2026-11-05-test-results.json. Last installer-only addition verified by focused tests; no second full run claimed. Build/logs and machine-readable summary analysis/2026-11-05-usb-boot-validation.json. WIM integrity passed; all eight USB EFI files, extracted WinPE winload.efi and ntoskrnl.exe are ARM64. No native boot phases/times, Windows stop, CPU/IRQ/timer or display/input/USB/SSH/RDP liveness for this candidate. Verdict implemented; hardware outcome inconclusive. Recovery artifacts remain .local/recovery-20261105-before-discovery.
+
+Operator clarification 2026-11-05T12:16:22.931135+00:00: prior internal Asahi/UEFI installation was deleted. Fresh diskutil list confirms no internal ESP or stub installation. This supersedes only the current availability assumption from EXP037; it does not rewrite the earlier observed boot/install result. New script scripts/install-j413-usb-discovery.py pins current bytes; offline --verify-only passes. Its target preflight correctly rejects the absent old UUID before any disk mount/write. --esp-uuid supports a separately recreated and explicitly identified ESP. No repartition, bootstrap recreation or reboot performed, consistent with the operator request to verify before reinstalling. Native 100 percent functionality cannot be inferred before a physical boot and is not claimed.
+
+Software test-harness correction: while extending installer tests, the first inherited fixture patched the old module instead of the new module. It attempted local backup-directory setup and was denied before any disk mount or payload write. The fixture now patches each selected module and asserts temporary-root/backup isolation; all 15 installer tests pass. No internal ESP was present or modified.
+
+Final read-only cross-check 2026-11-05T12:19:06.035816+00:00: source overlays/manifests still match image SHA817b006fb1f5c9c23140dba3410ca2a6caa01fa0b3c73bb590324682289cc4ed; new installer --verify-only passes under /usr/bin/python3 and all 15 installer tests pass. Fresh USB1 descriptor/link is 5Gb/s with bcdUSB 0x0320, not the previous 480Mb/s descriptor; recorded in analysis/2026-11-05-current-usb-after-reconnect.json. Previous USB2 fallback observation remains historical capability evidence only. Operator explicitly requires verification before reinstalling; no bootstrap recreation or internal payload installation/reboot performed. Validation summary analysis/2026-11-05-usb-boot-validation.md states all remaining physical/runtime limits.
+
+
+## EXP-20261105-J413-043 — direct same-volume installer and driver ownership audit
+
+Before read-only source/software diagnostics 2026-11-05T12:33:41.651169+00:00: source identity/diff hashes analysis/2026-11-05-direct-setup-driver-source-state.json; root master; pinned submodules unchanged. User confirms the current goal is Windows Setup, not an installed OS, and asks for fixed same-volume boot plus missing drivers. Capture current macOS ADT and disk topology; inspect Asahi implementations, pinned m1n1 stage/variable handling, Mu ACPI/BDS/storage, Microsoft WDK/VHF/WinPE interfaces and prior EXP037/040. No hardware MMIO writes, install, formatting, partition creation, driver deployment or reboot. Current candidate SHA817b006fb1f5c9c23140dba3410ca2a6caa01fa0b3c73bb590324682289cc4ed, manifest dist/j413/boot-experiment/MANIFEST.json, physical/off/debug qualification; recovery .local/recovery-20261105-before-discovery. Expected checkpoint: a falsifiable direct-boot design tied to an explicit partition identity, and source-backed driver gaps; no invented runtime completion.
+
+
+## EXP-20261105-J413-044 — local single-volume Setup artifact
+
+Before local artifact build 2026-11-05T12:54:06.351774+00:00: source states/diffs analysis/2026-11-05-direct-media-before.json. Functional variable is Setup packaging/target identity, no hardware configuration. Create only .local/direct-setup/J413SETUP.sparseimage as a new 12GiB GPT/FAT32 disk image; obtain its partition UUID from hdiutil/diskutil metadata; build a direct loader for that exact identity. Commands hdiutil create -size 12g -type SPARSE -fs MS-DOS-FAT32 -layout GPTSPUD -volname J413SETUP ; wimlib-imagex verify /Volumes/WININSTALL/sources/install.wim ; stage same-volume boot/EFI/source files and split the greater-than-4GB install.wim into FAT-sized SWM pieces. New artifact hashes/manifests will be mandatory before any native launch. Current candidate SHA817b006fb1f5c9c23140dba3410ca2a6caa01fa0b3c73bb590324682289cc4ed and its manifested recovery remain unchanged. Target is a newly created local image, not the physical USB or internal disk. No partition resize, installed ESP write, bootstrap enrollment or reboot. Expected checkpoint: complete and hash-verified same-volume media, fixed GUID selection and software build; no native USB/Windows/driver success inferred.
+
+
+## EXP-20261105-J413-045 — build fixed-partition Setup candidate
+
+Before software build 2026-11-05T13:13:36.633349+00:00: source IDs/diffs and local target analysis/2026-11-05-direct-build-state.json. Root master 015b78fdfd58b5f5884ae260fd6e2f96c11c8da7; same pinned dirty submodules. Source plan analysis/2026-11-05-direct-setup-driver-plan.md. The operator delegates target choice; choose a same-volume internal-style FAT bundle to remove USB storage from the intended installer path, but prepare it only as the new local disk image now. Target partition UUID 9E7B3C33-1721-4EBF-8C9C-A5D4A798B224 is the mounted image, not an internal installation. Command scripts/build-j413-boot-experiment.sh > investigation/analysis/2026-11-05-direct-build.log 2>&1 . Full Mu/two-stage build, physical/off/debug qualification. Changed functional software contracts are explicit early NVMe root binding plus fixed GPT selection; no causal attribution between them without separate future hardware checkpoints. No reset/PHY/DMA/IRQ/Windows-driver runtime change. Prior candidate SHA817b006fb1f5c9c23140dba3410ca2a6caa01fa0b3c73bb590324682289cc4ed and manifest preserved in .local/recovery-20261105-before-direct-setup. New hashes mandatory after build; no native install or launch. Expected checkpoint: matching firmware/target/source/nested manifests and complete local Setup volume, not native Windows success.
+
+After first software build 2026-11-05T13:18:42.239751+00:00, EXP-20261105-J413-045: Mu compilation rejected unused J413NextEfiOption under warnings-as-errors after direct selection replaced its caller. No new boot.bin was published and no launch occurred. Verdict rejected for that build. Correct direct-only preprocessing to exclude the obsolete generic queue/scanner instead of suppressing the compiler warning; add strict actual-header compilation regression before retry. Previous manifested recovery remains intact.
+
+
+## EXP-20261105-J413-046 — direct-only compiler correction and build retry
+
+Before software rebuild 2026-11-05T13:19:26.095815+00:00: source/diff identity analysis/2026-11-05-direct-build-retry-state.json, root f8724ceafc09293db6a22b5631901c674979fa8b. Relative to failed EXP045 only direct-only compilation/bookkeeping is corrected; no additional hardware or launch behavior changed. Command scripts/build-j413-boot-experiment.sh > investigation/analysis/2026-11-05-direct-build-retry.log 2>&1 . Same local disk-image target UUID9E7B3C33-1721-4EBF-8C9C-A5D4A798B224, physical/off/debug qualification, new SHA pending build. Prior manifested candidate/recovery .local/recovery-20261105-before-direct-setup untouched. Expected build/manifest/source/nested success; no physical install/launch/reboot.
+
+
+## EXP-20261105T132915Z-DIRECT-SETUP-cd38e02a — same-volume Setup staging
+
+Before 2026-11-05T13:29:15.222806+00:00: target /Volumes/J413SETUP PARTUUID 9E7B3C33-1721-4EBF-8C9C-A5D4A798B224; firmware SHA256 bcfedfbfe7695014503fdc64c871f9a490f91be6cef927002ec2f3dcbcbef1d6; manifest /Users/liamsitbon/Pictures/gemini/windows-on-m2-air-main/dist/j413/boot-experiment/MANIFEST.json; command ['tools/j413_setup_bundle.py', '--source', '/Volumes/WININSTALL', '--volume', '/Volumes/J413SETUP', '--partition-uuid', '9E7B3C33-1721-4EBF-8C9C-A5D4A798B224', '--apply']. Existing different files are rejected before copy; original source and internal partition layout are preserved. Expected checkpoint complete hashed ARM64 FAT32 Setup plus firmware on one volume; no launch.
+
+After 2026-11-05T13:32:49.522785+00:00, EXP-20261105T132915Z-DIRECT-SETUP-cd38e02a: staged and hash/WIM verified; MEDIA.json /Volumes/J413SETUP/J413Setup/MEDIA.json; verdict implemented; no native boot phases, stop code, CPU/IRQ/timer/input/storage/network liveness or reboot.
+
+Publication privacy correction 2026-11-05T13:38:57.887132+00:00: before the user-authorized HackWinDos source publication, fixed machine-specific console/vUART endpoint strings were replaced with placeholders in historical public documentation and with explicit environment inputs in launchers. This is privacy/portability redaction only; no prior verdict, stop code, artifact hash, hardware result or elapsed-time assertion was changed. Original exact file bytes and SHA256 are preserved under .local/github-publish/private-source/SHA256.json and local Git history. Source histories are unrelated to current GitHub main; publish a reviewed source snapshot as a child of its existing head without force. User explicitly requests main only; remote branch inventory contains only main, recorded in .local/github-publish/REMOTE-BRANCHES.before.txt.
+
+After software verification 2026-11-05T13:46:21.724146+00:00, EXP-20261105-J413-046: full Mu and two-stage rebuild succeeded. boot.bin size 2541000 SHA256 bcfedfbfe7695014503fdc64c871f9a490f91be6cef927002ec2f3dcbcbef1d6; J413_EFI.fd SHA256 234421d3d1abb053cf0e9b17901edd88adf31e2a86afa5bbf35486f066d42d58; overlay c2d388806b05840e6dbafe7ee4636ff2a82803420baaa49c8dae941592842e60. Exact image/nested CRC/profile/current source checks and installer --verify-only passed. Focused tests at this checkpoint: 92 J413 tests, 91 pass/one skip. Log analysis/2026-11-05-direct-build-retry.log. No physical install/launch, boot phases, elapsed guest time, stop code/parameters, CPU/IRQ/timer or display/USB/storage/SSH/RDP liveness was measured. Verdict implemented; native causality inconclusive. This artifact is preserved before the next single-variable Aurora DART admission build.
+
+After software preparation 2026-11-05T13:46:21.724146+00:00, EXP-20261105-J413-043 and EXP-20261105-J413-044: direct GUID-only selection and single-volume staging implemented, not hardware-qualified. New local 12GiB sparse image .local/direct-setup/J413SETUP.sparseimage PARTUUID 9E7B3C33-1721-4EBF-8C9C-A5D4A798B224 mounted as /Volumes/J413SETUP; no physical partition change. Actual stage EXP-20261105T132915Z-DIRECT-SETUP-cd38e02a copied/hash-verified 964 files and two split install WIM parts. Full original install.wim and staged boot/split WIM integrity verified; all 3 installation images and both PE/Setup images declare ARM64. Physical USB source remains unchanged. DockChannel software logic fixed; native Windows SYS/driver/hardware qualification still missing. No runtime observations; verdict implemented and native boot inconclusive.
+
+
+## EXP-20261105-J413-047 — Aurora DART readback admission build
+
+Before software build 2026-11-05T13:48:20.976179+00:00: source identities analysis/2026-11-05-aurora-build-state.json; branch main root 2877f7e320acbcbebcb0ab23493a5a5eb144b0b6. Hypothesis: verifying every TCR prevents false readiness when a requested bypass value fails to latch. Single behavior variable: actual DART readback admission; no initialization write/reset/power/IRQ/DMA/address change. Plan/source/license review analysis/2026-11-05-aurora-integration-plan.md. Build command scripts/build-j413-boot-experiment.sh > investigation/analysis/2026-11-05-aurora-build.log 2>&1 . Target remains local-image PARTUUID 9E7B3C33-1721-4EBF-8C9C-A5D4A798B224, debug qualification/physical/off/both no-proxy stages. Prior image SHA256 bcfedfbfe7695014503fdc64c871f9a490f91be6cef927002ec2f3dcbcbef1d6 and manifest preserved .local/recovery-20261105-before-aurora-dart/boot-experiment plus SHA256.json. Expected checkpoint build and exact nested/profile/source manifests; smallest future physical check both DART banks read back bypass then nonzero UsbIo. Failure exact bank/SID/TCR or build error. No install/launch/reboot; recovery macOS and preserved previous bytes.
+
+After software build 2026-11-05T13:52:42.582846+00:00, EXP-20261105-J413-047: full Mu plus both ARM64 m1n1 stages succeeded; boot.bin 2541252 bytes SHA256 42fe5acbd493cd66e765a64df91f5b49b62042512748242b1276643de58203e8; J413_EFI.fd SHA256 27a8a1968a9c2605a40ba0b87f96a846036152555e698ea28d7f5d3b48e8b8d4; manifest dist/j413/boot-experiment/MANIFEST.json, overlay 2bcca8cff187f8d3f11b9ad2f53b876b46a76cf0088fb7084be7c6d8ef1b7841. Nested CRC/profile and exact artifact validation passed; build log analysis/2026-11-05-aurora-build.log. Prior direct image preserved as recorded. No physical install/launch/reboot and no boot phases, stop code/parameters, CPU/IRQ/timer or display/USB input/storage/SSH/RDP liveness measured. Verdict implemented; hypothesis of false software admission confirmed by regression, physical causal hypothesis inconclusive. Next smallest physical checkpoint both DART banks accepted then USB enumeration, independently of direct NVMe volume selection.
+
+
+## EXP-20261105-J413-048 — update only firmware in verified local Setup image
+
+Before 2026-11-05T13:53:19.021035+00:00: local virtual FAT volume /Volumes/J413SETUP PARTUUID 9E7B3C33-1721-4EBF-8C9C-A5D4A798B224; new firmware SHA256 42fe5acbd493cd66e765a64df91f5b49b62042512748242b1276643de58203e8 manifest dist/j413/boot-experiment/MANIFEST.json, debug/physical/off; root 7ced3c088f750ac512c7e7df39e29efd2a73c531. Exact prior payload SHA256 bcfedfbfe7695014503fdc64c871f9a490f91be6cef927002ec2f3dcbcbef1d6 and four provenance files preserved under .local/recovery-20261105-before-aurora-media. Command python3 .local/task-tools/update_local_media.py. Single variable relative to verified EXP044 is firmware DART-readback admission; Microsoft installer bytes/WIMs unchanged. First recheck every recorded file/part hash against old manifest; only then atomically replace local firmware/metadata and verify new manifest. No physical partition/image install or launch. Failure criterion mismatched identity/hash or copy/verify error; recovery prior local files and source sparse image.
+
+After 2026-11-05T13:53:40.370347+00:00, EXP-20261105-J413-048: previous full media hashes passed; new local firmware and provenance replaced and all hashes passed again. No Microsoft installer content changed; source/split WIM integrity from EXP044 preserved. Verdict implemented, native boot inconclusive; no CPU/IRQ/timer/stop/liveness or guest phase measurements. No reboot.
+
+Final software verification 2026-11-05T13:53:58.031327+00:00: full root suite 1611 tests, 90 failures, 55 errors, 42 skips; compared with 1583-test prior run (91 failures/55 errors/42 skips) there are no newly failing test headers and the host-path hygiene failure is removed. Focused J413 suite 92 tests: 91 pass/one skip; 25 installation transaction tests and 9 artifact-manifest tests pass. Exact full-suite paths/delta: analysis/2026-11-05-final-tests-summary.json and local analysis/2026-11-05-final-full-suite.log. No all-project pass or native readiness is claimed. Colima started for builds is stopped after containers finished.

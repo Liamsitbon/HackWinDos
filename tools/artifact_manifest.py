@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -39,6 +40,9 @@ ARTIFACT_ROLES = {
     "J413_EFI.fd": "guest-firmware",
 }
 
+M1N1_BUILD_TAG_MARKER = b"##m1n1_ver##"
+M1N1_BUILD_TAG_PATTERN = re.compile(rb"[ -~]+")
+
 
 class ManifestError(RuntimeError):
     pass
@@ -59,6 +63,42 @@ def _sha256(path: Path) -> str:
         for chunk in iter(lambda: stream.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def _m1n1_build_tag(path: Path) -> str:
+    """Read the identity compiled into m1n1 by version.sh."""
+    data = path.read_bytes()
+    offsets = []
+    start = 0
+    while True:
+        offset = data.find(M1N1_BUILD_TAG_MARKER, start)
+        if offset < 0:
+            break
+        offsets.append(offset)
+        start = offset + len(M1N1_BUILD_TAG_MARKER)
+    if len(offsets) != 1:
+        raise ManifestError(
+            f"m1n1 build identity marker count is {len(offsets)}, expected 1: {path}"
+        )
+    value = data[offsets[0] + len(M1N1_BUILD_TAG_MARKER):]
+    match = M1N1_BUILD_TAG_PATTERN.match(value)
+    if match is None:
+        raise ManifestError(f"m1n1 build identity is empty: {path}")
+    return match.group().decode("ascii")
+
+
+def _validate_m1n1_build_identity(
+    path: Path, source_commit: str, *, expected_tag: str | None = None
+) -> str:
+    tag = _m1n1_build_tag(path)
+    if tag.endswith("-dirty"):
+        raise ManifestError(f"m1n1 build identity is dirty: {tag}")
+    required = expected_tag if expected_tag is not None else source_commit[:7]
+    if tag != required:
+        raise ManifestError(
+            f"m1n1 build identity mismatch: expected {required}, got {tag}"
+        )
+    return tag
 
 
 def _clean_revision(root: Path) -> str:
@@ -93,6 +133,7 @@ def create_manifest(
     compiler: str,
     allow_dirty: bool = False,
     artifact_roles: dict[str, str] | None = None,
+    capabilities: tuple[str, ...] = (),
     platform: str = "j313",
 ) -> Path:
     root = root.resolve()
@@ -107,6 +148,10 @@ def create_manifest(
         raise ManifestError(f"unsupported platform: {platform}")
     if platform == "j413" and profile != "debug":
         raise ManifestError("J413 has no hardware-qualified release; use debug")
+    normalized_capabilities = sorted(set(capabilities))
+    for capability in normalized_capabilities:
+        if not re.fullmatch(r"[a-z0-9][a-z0-9-]*", capability):
+            raise ManifestError(f"invalid capability: {capability}")
     expected_contract = GUEST_CONTRACTS[platform]
     layout_path = root / "config" / f"{platform}-guest-layout.json"
     try:
@@ -140,6 +185,11 @@ def create_manifest(
         record = {"size": path.stat().st_size, "sha256": _sha256(path)}
         if name in roles:
             record["role"] = roles[name]
+        if name == "m1n1.macho" and revisions.get("m1n1_windows_commit"):
+            if not revisions.get("m1n1_windows_dirty", False):
+                record["build_tag"] = _validate_m1n1_build_identity(
+                    path, revisions["m1n1_windows_commit"]
+                )
         artifacts[name] = record
     data = {
         "format_version": 2,
@@ -150,6 +200,7 @@ def create_manifest(
         "compiler": compiler,
         "guest_layout_sha256": _sha256(layout_path),
         "guest_contract": guest_contract,
+        "capabilities": normalized_capabilities,
         **revisions,
         "artifacts": artifacts,
     }
@@ -159,6 +210,10 @@ def create_manifest(
             raise ManifestError("J413 firmware source overlay is missing")
         from tools.j413_platform import overlay_sha256
         data["platform_overlay_sha256"] = overlay_sha256(root)
+        from tools.j413_direct_setup import RELATIVE, target_uuid
+        if (overlay_dir / RELATIVE).exists():
+            data["direct_setup"] = {"mode": "single-gpt-volume", "partition_uuid": target_uuid(root),
+                                    "loader_path": "\\EFI\\BOOT\\BOOTAA64.EFI"}
         if "boot.bin" in artifacts:
             from tools.j413_platform import m1n1_sources_sha256
             data["platform_m1n1_sources_sha256"] = m1n1_sources_sha256(root)
@@ -177,13 +232,14 @@ def verify_manifest(
     expected_display: str | None = None,
     expected_debug: str | None = None,
     expected_platform: str | None = None,
+    required_capabilities: tuple[str, ...] = (),
 ) -> dict:
     path = path.resolve()
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as error:
         raise ManifestError(f"cannot read manifest: {path}") from error
-    platform = data.get("platform")
+    platform = data.get("platform", "j313")
     if data.get("format_version") != 2 or platform not in GUEST_CONTRACTS:
         raise ManifestError("unsupported artifact manifest")
     if expected_platform is not None and platform != expected_platform:
@@ -192,6 +248,18 @@ def verify_manifest(
         raise ManifestError("J413 has no hardware-qualified release")
     if platform == "j413" and len(data.get("platform_overlay_sha256", "")) != 64:
         raise ManifestError("J413 firmware source overlay provenance is missing")
+    if "direct_setup" in data:
+        import uuid
+        target = data["direct_setup"]
+        try:
+            identity = uuid.UUID(target["partition_uuid"])
+            valid = (isinstance(target, dict) and platform == "j413" and identity.int != 0 and
+                     target["partition_uuid"] == str(identity).upper() and target["mode"] == "single-gpt-volume" and
+                     target["loader_path"] == "\\EFI\\BOOT\\BOOTAA64.EFI")
+        except (ValueError, KeyError, TypeError, AttributeError):
+            valid = False
+        if not valid:
+            raise ManifestError("Invalid direct Setup target contract")
     if platform == "j413" and "boot.bin" in data.get("artifacts", {}):
         if len(data.get("platform_m1n1_sources_sha256", "")) != 64 or data.get("qualification") != "experimental-source-contract-no-hardware-launch":
             raise ManifestError("J413 experimental boot source provenance is missing")
@@ -207,6 +275,14 @@ def verify_manifest(
         raise ManifestError(
             f"debug mode mismatch: expected {expected_debug}, got {data.get('debug')}"
         )
+    capabilities = data.get("capabilities", [])
+    if not isinstance(capabilities, list):
+        raise ManifestError("invalid manifest capabilities")
+    missing_capabilities = sorted(set(required_capabilities) - set(capabilities))
+    if missing_capabilities:
+        raise ManifestError(
+            "missing capability: " + ", ".join(missing_capabilities)
+        )
     if not data.get("compiler") or len(data.get("guest_layout_sha256", "")) != 64:
         raise ManifestError("incomplete artifact provenance")
     if data.get("guest_contract") != GUEST_CONTRACTS[platform]:
@@ -217,6 +293,12 @@ def verify_manifest(
             raise ManifestError(f"artifact is missing: {artifact}")
         if artifact.stat().st_size != record.get("size") or _sha256(artifact) != record.get("sha256"):
             raise ManifestError(f"artifact hash mismatch: {artifact}")
+        if name == "m1n1.macho" and data.get("m1n1_windows_commit"):
+            _validate_m1n1_build_identity(
+                artifact,
+                data["m1n1_windows_commit"],
+                expected_tag=record.get("build_tag"),
+            )
     for name, role in (expected_roles or {}).items():
         if data.get("artifacts", {}).get(name, {}).get("role") != role:
             raise ManifestError(f"artifact role mismatch: {name} is not {role}")
@@ -236,6 +318,7 @@ def main() -> int:
     create.add_argument("--debug", required=True)
     create.add_argument("--compiler", required=True)
     create.add_argument("--allow-dirty", action="store_true")
+    create.add_argument("--capability", action="append", default=[])
     create.add_argument("--platform", choices=tuple(GUEST_CONTRACTS), default="j313")
     create.add_argument("artifacts", nargs="+")
     verify = subparsers.add_parser("verify")
@@ -245,6 +328,7 @@ def main() -> int:
     verify.add_argument("--debug")
     verify.add_argument("--platform", choices=tuple(GUEST_CONTRACTS))
     verify.add_argument("--require-role", action="append", default=[], metavar="NAME=ROLE")
+    verify.add_argument("--require-capability", action="append", default=[])
     args = parser.parse_args()
     try:
         if args.command == "create":
@@ -258,6 +342,7 @@ def main() -> int:
                     args.artifacts,
                     compiler=args.compiler,
                     allow_dirty=args.allow_dirty,
+                    capabilities=tuple(args.capability),
                     platform=args.platform,
                 )
             )
@@ -274,6 +359,7 @@ def main() -> int:
                 args.manifest, args.profile, roles,
                 expected_display=args.display, expected_debug=args.debug,
                 expected_platform=args.platform,
+                required_capabilities=tuple(args.require_capability),
             )
             print(f"validated {data['platform']} {data['profile']} artifacts")
     except ManifestError as error:

@@ -1,0 +1,169 @@
+{
+  "timestamp_utc": "2026-11-05T12:16:22.931135+00:00",
+  "root_commit": "448152e1066ef02fa0642842a668af9b43a3da1b",
+  "qualification": "software-verified-physical-boot-unqualified",
+  "artifacts": {
+    "J413_EFI.fd": {
+      "role": "guest-firmware",
+      "sha256": "41d910d08439e5fd0c902af4d9164675f25ddabd4d3f6d0482e572c3ed9daa8f",
+      "size": 30965760
+    },
+    "TOOLCHAINS.json": {
+      "sha256": "baf2dd449fd89d3a6dea65502898e0755bbca18e716daa3a237411b440500172",
+      "size": 160
+    },
+    "boot.bin": {
+      "role": "standalone-bootstrap",
+      "sha256": "817b006fb1f5c9c23140dba3410ca2a6caa01fa0b3c73bb590324682289cc4ed",
+      "size": 2541096
+    },
+    "m1n1-stage0.bin": {
+      "role": "autonomous-stage0",
+      "sha256": "e93ed5424648630870d74de72ce6cc44539f8d2e7b0e24a9779115631964a764",
+      "size": 1310720
+    },
+    "m1n1-stage1.bin": {
+      "role": "autonomous-stage1",
+      "sha256": "8e3dfb2d25cf2a7f36a468b655cb74dcb6409692c356b77fe6d655e2483c90d7",
+      "size": 1310720
+    }
+  },
+  "platform_overlay_sha256": "9278b29515e0abf0c78d11bf6f8de1d45bb6644a0f05687343f5aba0820eae5a",
+  "platform_m1n1_sources_sha256": "274bc024eb59ea841915384698883c644713a760fb3649dc48f3a0f01329f342",
+  "focused_tests": {
+    "total": 69,
+    "pass": 68,
+    "skip": 1
+  },
+  "full_suite": {
+    "current": [
+      "Ran 1583 tests in 128.509s",
+      "FAILED (failures=91, errors=55, skipped=42)"
+    ],
+    "previous": [
+      "Ran 1561 tests in 124.198s",
+      "FAILED (failures=91, errors=55, skipped=42)"
+    ],
+    "new_failure_headers": [],
+    "removed_failure_headers": [],
+    "failure_groups": {
+      "test_agx_firmware_io": 1,
+      "test_agx_initdata_defaults": 1,
+      "test_agx_m1n1_queue_backend": 1,
+      "test_agx_m1n1_render_backend": 1,
+      "test_apple_agx_ad03_compiler_fixture": 1,
+      "test_apple_agx_ad03_source_contract": 4,
+      "test_apple_agx_ad03_vs_fs_fixture": 2,
+      "test_apple_agx_backend_runtime": 1,
+      "test_apple_agx_d3d10_frontend_prepare": 1,
+      "test_apple_agx_dynamic_dma": 1,
+      "test_apple_agx_dynamic_job": 1,
+      "test_apple_agx_gdi": 1,
+      "test_apple_agx_mesa_source": 2,
+      "test_apple_agx_mesa_win32_transport": 1,
+      "test_apple_agx_output_expectation_lifetime": 1,
+      "test_apple_agx_pipeline_address_inventory": 1,
+      "test_apple_agx_pipeline_bo_overlay": 1,
+      "test_apple_agx_post_display_route": 1,
+      "test_apple_agx_present_fault_notification": 1,
+      "test_apple_agx_queue_fault_snapshot": 1,
+      "test_apple_agx_reloc_capture": 1,
+      "test_apple_agx_render_admission": 1,
+      "test_apple_agx_render_platform": 1,
+      "test_apple_agx_render_standard_allocation": 2,
+      "test_apple_agx_render_work_queue": 1,
+      "test_apple_agx_required_formats": 2,
+      "test_apple_agx_sampler_ranges": 1,
+      "test_apple_agx_standard_rgba_backbuffer": 1,
+      "test_apple_agx_win32_pipe_screen": 1,
+      "test_bootargs_layout": 3,
+      "test_g3_copy_query_receipt": 2,
+      "test_g3_local_reserve_abi": 1,
+      "test_g3_local_reserve_aml": 1,
+      "test_g3_local_reserve_selector": 1,
+      "test_g3_mu_fv_identity": 1,
+      "test_g3_mu_hob_reserve": 2,
+      "test_g3_mu_local_reserve": 2,
+      "test_g3_mu_virtual_memory_table_capacity": 2,
+      "test_g3_paging_root_ordering": 2,
+      "test_g3_private_escape_entry": 4,
+      "test_g3_reserve_stage2": 1,
+      "test_g3_software_copy_escape": 2,
+      "test_g3_start_resource_replay": 1,
+      "test_g3_vidmm_replay": 44,
+      "test_g4_primary_import_alignment": 1,
+      "test_g4_r105_open_normalization": 1,
+      "test_g4_real_broker_builder_replay": 1,
+      "test_g4_shader_null_replay": 4,
+      "test_g4_usc_window_replay": 1,
+      "test_gpuva_broker_v5_contract": 3,
+      "test_gpuva_g3_caps_contract": 1,
+      "test_gpuva_g3_cpu_visible_segment": 1,
+      "test_gpuva_g3_createcontext_contract": 1,
+      "test_gpuva_g3_paging_bootstrap": 1,
+      "test_gpuva_worker_submit_gate": 1,
+      "test_hvc_resume_instruction": 1,
+      "test_j313_agx_abi_admission_contract": 3,
+      "test_j313_agx_g2_contract": 1,
+      "test_j313_agx_g2_m1n1_policy": 1,
+      "test_j313_agx_g2_mu_profile": 4,
+      "test_m1_ramdisk_window": 5,
+      "test_m1n1_pool_window": 2,
+      "test_mkexp_native_source": 1,
+      "test_r145_allocation_intent": 1,
+      "test_r150_backend_identity": 3,
+      "test_repository_hygiene": 1,
+      "test_umd_async_render_completion": 1,
+      "test_umd_system_direct_limit": 1
+    }
+  },
+  "media": {
+    "/Volumes/M2BOOT": {
+      "files": {
+        "efi/boot/bootaa64.efi": {
+          "size": 3120648,
+          "header_valid": true
+        },
+        "efi/microsoft/boot/bcd": {
+          "size": 16384,
+          "header_valid": true
+        },
+        "sources/boot.wim": {
+          "size": 630231583,
+          "header_valid": true
+        },
+        "boot/boot.sdi": {
+          "size": 3170304,
+          "header_valid": true
+        }
+      },
+      "errors": [],
+      "qualification": "headers-only-no-runtime-proof"
+    },
+    "/Volumes/WININSTALL": {
+      "files": {
+        "efi/boot/bootaa64.efi": {
+          "size": 3120648,
+          "header_valid": true
+        },
+        "efi/microsoft/boot/bcd": {
+          "size": 16384,
+          "header_valid": true
+        },
+        "sources/boot.wim": {
+          "size": 630231583,
+          "header_valid": true
+        },
+        "boot/boot.sdi": {
+          "size": 3170304,
+          "header_valid": true
+        }
+      },
+      "errors": [],
+      "qualification": "headers-only-no-runtime-proof"
+    }
+  },
+  "media_experiment": "EXP-20261105T120605Z-USB-MEDIA-d9d9cb60",
+  "bootstrap": "Prior internal Asahi ESP absent; operator confirms deletion; no reinstall authorized/executed during this verification turn.",
+  "native_boot": "Unverified; EXP037 remains a failed USB boot; no success inferred from new tests."
+}

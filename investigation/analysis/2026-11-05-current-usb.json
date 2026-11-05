@@ -1,0 +1,31 @@
+{
+  "timestamp_utc": "2026-11-05T11:51:48.693275+00:00",
+  "usb": {
+    "IORegistryEntryName": "Root",
+    "IOObjectClass": "IORegistryEntry",
+    "children": [
+      {
+        "IORegistryEntryName": "AppleT8112USBXHCI",
+        "IOObjectClass": "AppleT8112USBXHCI",
+        "children": []
+      },
+      {
+        "IORegistryEntryName": "AppleT8112USBXHCI",
+        "IOObjectClass": "AppleT8112USBXHCI",
+        "children": [
+          {
+            "IORegistryEntryName": "USB3.1 Hub",
+            "IOObjectClass": "IOUSBHostDevice",
+            "children": []
+          },
+          {
+            "IORegistryEntryName": "USB2.1 Hub",
+            "IOObjectClass": "IOUSBHostDevice",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  "external_disk_list": ""
+}

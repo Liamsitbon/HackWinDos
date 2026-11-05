@@ -4,8 +4,15 @@ This fork adds an experimental **Mac14,2 / T8112 / J413** firmware target and
 local hardware research to the original M1 project. The J413 UEFI component
 builds, exposes eight CPU entries and a 2560×1664 framebuffer contract, and has
 host-tested AIC2 IRQ routing patches. **Windows boot, G14G GPU acceleration and
-built-in M2 input have not been qualified.** The firmware component is not an
-installable boot image.
+built-in M2 input have not been qualified.** A manifested experimental `boot.bin` can be built; it has not passed native M2 hardware boot.
+
+The current Setup path binds a single explicit GPT partition UUID and validates only
+its ARM64 `\EFI\BOOT\BOOTAA64.EFI`. A complete FAT32 bundle can hold the bootstrap,
+boot files and split installation images on that same volume. See the
+[J413 direct Setup guide](documentation/J413_DIRECT_SETUP.md) for the prepared scripts
+Aurora Silicon integration and source/license review: [USB DART admission](documentation/AURORA_INTEGRATION.md).
+and exact limits. Custom M2 graphics/input drivers remain unqualified; audio, Wi-Fi,
+Bluetooth and camera drivers are not completed in this checkout.
 
 Start with [J413 status and build instructions](documentation/J413_STATUS.md)
 and [organized local kext research](documentation/reverse-engineering/README.md).
@@ -57,7 +64,11 @@ developed on `feature/j313-gpu-acceleration`, not on `main`.
 
 Only `j313` is currently supported. This is not a general Apple Silicon Windows installer.
 
-## Development branches
+## Historical upstream development branches
+
+This repository publishes current work on `main`. The following names describe
+upstream development history; they are not additional branches of this fork.
+
 
 | Branch | Purpose | State |
 | --- | --- | --- |

@@ -16,6 +16,7 @@ if [ "$(uname -s)" = Darwin ] && [ "${J413_IN_CONTAINER:-0}" != 1 ]; then
     exec docker run --rm -e J413_IN_CONTAINER=1 -v "$ROOT:/work" -w /work \
         windows-on-m2-build:local scripts/build-j413-firmware.sh
 fi
+python3 "$ROOT/tools/j413_direct_setup.py" --check
 python3 "$ROOT/tools/j413_platform.py" --stage
 python3 "$ROOT/tools/prepare_j413_exfat.py"
 VENV="$ROOT/.build/j413-venv"

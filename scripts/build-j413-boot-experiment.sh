@@ -16,6 +16,7 @@ if [ "$(uname -s)" = Darwin ] && [ "${J413_IN_CONTAINER:-0}" != 1 ]; then
         -v "$ROOT:/work" -w /work windows-on-m2-build:local scripts/build-j413-boot-experiment.sh
 fi
 cd "$ROOT"
+python3 tools/j413_direct_setup.py --check
 python3 tools/j413_platform.py --stage-m1n1
 if [ "${J413_SKIP_MU:-0}" != 1 ]; then scripts/build-j413-firmware.sh; fi
 python3 tools/artifact_manifest.py verify dist/j413/firmware-debug/MANIFEST.json \

@@ -1,0 +1,38 @@
+{
+  "captured_utc": "2026-11-05T13:45:15.263170+00:00",
+  "repositories": {
+    "m1n1": {
+      "commit": "cf57aebc36b2c51c546d97f09e9bf390ff3f7be7",
+      "branch": "main"
+    },
+    "mu": {
+      "commit": "063c6b34da94801d1ee9085594e5ac71ae1793b9",
+      "branch": "main"
+    },
+    "aura": {
+      "commit": "077aabecd595fab9ebe34d3f3a28f10a82865d17",
+      "branch": "main"
+    },
+    "aurora-diag": {
+      "commit": "db3e5b85b30bbcf83dc81c896404a712cc2644c1",
+      "branch": "main"
+    },
+    "linux": {
+      "commit": "0041b90bd066315fdcc3a07c39e5a063bd143627",
+      "branch": "integration/aurora"
+    }
+  },
+  "inspected_files_sha256": {
+    "mu/Silicon/Apple/AppleSiliconPkg/Drivers/AppleUsbTypeCBringupDxe/AppleUsbTypeCBringupDxe.c": "5bb2618309940ec6d1aa4c93c45eba6afc10cb404b9f4de1e7b770858f1ee7df",
+    "mu/Silicon/Apple/AppleSiliconPkg/Drivers/AppleUsb4BringupDxe/README.md": "e8af0e6b68625204566ec01e7b6c27784775a577685cc5267dacc2ba19d7f336",
+    "linux/drivers/iommu/apple-dart.c": "5187c857e34bd499713fd1b235a6ac490e1724f7d653e738edc1cb9f40fed830",
+    "linux/drivers/phy/apple/atc.c": "b4fe90b599f4efe3bbf58ad19b5be700883b01480da5c5eaf0fed3ad72a23b21",
+    "linux/drivers/usb/dwc3/dwc3-apple.c": "1481840d57d4e687b9a4ad126ada442896b2820b34040860a6ed4f1e262f71b1",
+    "linux/drivers/usb/dwc3/core.c": "28a4837b18fa0ac5cf7df821f1fe3e95edb4503096c3fba9a4998414636e3c8c",
+    "linux/arch/arm64/boot/dts/apple/t8112.dtsi": "de2fe21994f7514b0004060309026f268762d419223fe20dfb98d2c6bf330ce3",
+    "linux/drivers/hid/dockchannel-hid/dockchannel-hid.c": "680c9940aefb53ef53d7985b364f8f1b7164aa581ca4ec97231f1a580627b0a8",
+    "aura/LICENSE": "acb8a11264fd9c639b8659b0d971fa9d708698d57bf6e499eabaf957c393dff5",
+    "m1n1/src/usb.c": "c12269a22e4f47bd148de93e8993e5b9bd4948cc293d60e4f2ae635352f9d28e"
+  },
+  "copied_source_scope": "The bounded all-stream bypass readback loop from UsbDartVerifyControllerBypass adapted to existing ADT-validated APPLE_DART_INFO; no Aura or Linux implementation copied."
+}

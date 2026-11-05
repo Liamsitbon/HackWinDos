@@ -1,4 +1,4 @@
-"""Execute actual filesystem scanner, candidate iterator and BDS retry loop."""
+"""Execute exact-path loader discovery, candidate iterator and BDS retry loop."""
 from pathlib import Path
 import subprocess,tempfile,unittest
 ROOT=Path(__file__).resolve().parents[1]
@@ -19,6 +19,7 @@ PRELUDE=r'''
 #define EFI_NOT_FOUND 1
 #define EFI_BUFFER_TOO_SMALL 2
 #define EFI_OUT_OF_RESOURCES 3
+#define EFI_VOLUME_CORRUPTED 4
 #define EFI_ERROR(s) ((s)!=0)
 #define EFI_FILE_MODE_READ 1
 #define EFI_FILE_DIRECTORY 16
@@ -38,7 +39,7 @@ typedef struct FS EFI_SIMPLE_FILE_SYSTEM_PROTOCOL;
 struct FS {EFI_STATUS (*OpenVolume)(EFI_SIMPLE_FILE_SYSTEM_PROTOCOL*,EFI_FILE_PROTOCOL**);int index;};
 typedef struct {EFI_HANDLE Handle;CHAR16 Name[1024];} EFI_DEVICE_PATH_PROTOCOL;
 typedef struct {EFI_HANDLE Handle;CHAR16 Description[1024];int Status;} EFI_BOOT_MANAGER_LOAD_OPTION;
-static int allocations,opens,closes,scans,prints,init_fail,path_fail,malformed,grow,read_fail;
+static int allocations,opens,closes,scans,prints,directory_reads,other_opens,init_fail,path_fail,malformed,grow,read_fail,unterminated,oversize,pe32,short_read;
 static VOID *AllocatePool(UINTN n){void *p=malloc(n);assert(p);allocations++;return p;}
 static VOID *AllocateZeroPool(UINTN n){void *p=AllocatePool(n);memset(p,0,n);return p;}
 static VOID FreePool(VOID *p){assert(p);allocations--;free(p);}
@@ -56,29 +57,32 @@ static struct Node roots[]={ {L"",1,0,first,6}, {L"",1,0,second,1} };
 struct MOCK {EFI_FILE_PROTOCOL File;struct Node *node,*root;size_t position,entry;};
 static EFI_STATUS open_file(EFI_FILE_PROTOCOL*,EFI_FILE_PROTOCOL**,CHAR16*,UINT64,UINT64);
 static EFI_STATUS close_file(EFI_FILE_PROTOCOL *p){closes++;FreePool(p);return 0;}
-static EFI_STATUS seek_file(EFI_FILE_PROTOCOL *p,UINT64 off){((struct MOCK*)p)->position=off;return 0;}
+static EFI_STATUS seek_file(EFI_FILE_PROTOCOL *p,UINT64 off){((struct MOCK*)p)->position=off;if(!off)((struct MOCK*)p)->entry=0;return 0;}
 static EFI_STATUS read_file(EFI_FILE_PROTOCOL *p,UINTN *size,VOID *data){
  struct MOCK *m=(struct MOCK*)p;
  if(read_fail)return EFI_NOT_FOUND;
- if(m->node->directory){
+ if(m->node->directory){directory_reads++;
   if(m->entry==m->node->count){*size=0;return 0;}
-  if(grow && *size<8192){*size=8192;return EFI_BUFFER_TOO_SMALL;}
+  if((grow && *size<8192)||oversize){*size=oversize?65537:8192;return EFI_BUFFER_TOO_SMALL;}
   struct Node *n=&m->node->children[m->entry];size_t bytes=offsetof(EFI_FILE_INFO,FileName)+(wcslen(n->name)+1)*sizeof(CHAR16);
   if(*size<bytes){*size=bytes;return EFI_BUFFER_TOO_SMALL;}
   EFI_FILE_INFO *info=data;memset(info,0,bytes);info->Size=bytes;info->Attribute=n->directory?16:0;wcscpy(info->FileName,n->name);
   if(malformed){info->Size=bytes+sizeof(CHAR16);malformed=0;}
+  if(unterminated)info->FileName[wcslen(n->name)]=L'X';
   *size=bytes;m->entry++;return 0;
  }
  UINT8 image[256]={0};image[0]='M';image[1]='Z';image[60]=64;
  image[64]='P';image[65]='E';image[68]=m->node->kind==1?0x64:0x64;image[69]=m->node->kind==1?0x86:0xaa;
- image[84]=0xf0;image[88]=0x0b;image[89]=0x02;image[156]=m->node->kind==2?11:10;
+ image[84]=0xf0;image[88]=0x0b;image[89]=pe32?0x01:0x02;image[156]=m->node->kind==2?11:10;
  if(m->node->kind==3)image[0]=0;
- size_t avail=m->position<sizeof(image)?sizeof(image)-m->position:0; if(*size>avail)*size=avail;
+ size_t avail=m->position<sizeof(image)?sizeof(image)-m->position:0; if(*size>avail)*size=avail;if(short_read&&*size)(*size)--;
  memcpy(data,image+m->position,*size);m->position+=*size;return 0;
 }
 static EFI_FILE_PROTOCOL *make_file(struct Node *node,struct Node *root){struct MOCK *p=AllocateZeroPool(sizeof(*p));p->node=node;p->root=root;p->File=(EFI_FILE_PROTOCOL){open_file,close_file,read_file,seek_file};opens++;return &p->File;}
 static EFI_STATUS open_file(EFI_FILE_PROTOCOL *p,EFI_FILE_PROTOCOL **out,CHAR16 *path,UINT64 mode,UINT64 attr){
- assert(mode==1&&!attr);struct Node *node=((struct MOCK*)p)->root;*out=NULL;
+ assert(mode==1&&!attr);CHAR16 folded[1024];size_t k=0;for(;path[k];k++)folded[k]=path[k]>=L'A'&&path[k]<=L'Z'?path[k]+32:path[k];folded[k]=0;
+ if(wcscmp(folded,L"\\efi")&&wcscmp(folded,L"\\efi\\boot")&&wcscmp(folded,L"\\efi\\boot\\bootaa64.efi"))other_opens++;
+ struct Node *node=path[0]==L'\\'?((struct MOCK*)p)->root:((struct MOCK*)p)->node;*out=NULL;
  while(*path){while(*path==L'\\')path++;if(!*path)break;CHAR16 name[1024];size_t n=0;while(*path&&*path!=L'\\')name[n++]=*path++;name[n]=0;struct Node *found=NULL;
  for(size_t i=0;i<node->count;i++)if(!wcscmp(node->children[i].name,name)){found=&node->children[i];break;}
  if(!found)return 1;node=found;}
@@ -99,23 +103,41 @@ class EfiDiscoveryTests(unittest.TestCase):
    subprocess.run(['cc','-std=c11','-Wall','-Wextra','-Werror','-Wno-misleading-indentation','-Wno-unused-function','-fsanitize=address,undefined','-fno-sanitize-recover=all',str(p/'t.c'),'-o',str(p/'t')],check=True)
    subprocess.run([str(p/'t')],check=True,timeout=10)
 
- def test_actual_scanner_arbitrary_paths_types_dedup_and_cleanup(self):
+ def test_exact_path_only_across_filesystems_types_and_cleanup(self):
   self.run_c(PRELUDE+HEADER.read_text()+r'''
-static void reset(void){assert(!allocations);mEfiHead=mEfiTail=NULL;mEfiCount=0;mEfiScanned=0;mEfiAlreadyAttemptedHandle=NULL;init_fail=path_fail=malformed=grow=read_fail=0;opens=closes=scans=0;}
+static void reset(void){assert(!allocations);mEfiHead=mEfiTail=NULL;mEfiCount=0;mEfiScanned=0;init_fail=path_fail=malformed=grow=read_fail=0;opens=closes=scans=directory_reads=other_opens=0;roots[1].children=second;roots[1].count=1;boot[0].kind=0;}
 int main(void){EFI_BOOT_MANAGER_LOAD_OPTION o;
  reset();assert(J413NextEfiOption(&o)==0&&!wcscmp(o.Description,L"\\EFI\\BOOT\\BOOTAA64.EFI"));
- assert(J413NextEfiOption(&o)==0&&!wcscmp(o.Description,L"\\odd folder\\Mixed.EfI"));
- assert(J413NextEfiOption(&o)==0&&!wcscmp(o.Description,L"\\root.efi")&&o.Handle==(EFI_HANDLE)2);
  assert(J413NextEfiOption(&o)==1&&J413NextEfiOption(&o)==1&&scans==1&&opens==closes&&!allocations);
- reset();mEfiAlreadyAttemptedHandle=(EFI_HANDLE)1;assert(J413NextEfiOption(&o)==0&&!wcscmp(o.Description,L"\\odd folder\\Mixed.EfI"));assert(J413NextEfiOption(&o)==0&&o.Handle==(EFI_HANDLE)2);assert(J413NextEfiOption(&o)==1&&!allocations);
- reset();grow=1;int count=0;while(J413NextEfiOption(&o)==0)count++;assert(count==3&&opens==closes&&!allocations);
- reset();malformed=1;while(J413NextEfiOption(&o)==0){}assert(opens==closes&&!allocations);
+ assert(!other_opens); // ACPIVIEW/other EFI applications are never opened.
+ reset();roots[1].children=first;roots[1].count=1;
+ assert(J413NextEfiOption(&o)==0&&o.Handle==(EFI_HANDLE)1);
+ assert(J413NextEfiOption(&o)==0&&o.Handle==(EFI_HANDLE)2);
+ assert(J413NextEfiOption(&o)==1&&scans==1&&opens==closes&&!allocations&&!other_opens);
+ // An arbitrary ARM64 application alone is not a boot candidate.
+ reset();boot[0].kind=3;assert(J413NextEfiOption(&o)==1&&opens==closes&&!allocations&&!other_opens);
+ for(int kind=1;kind<=3;kind++){reset();boot[0].kind=kind;assert(J413NextEfiOption(&o)==1&&opens==closes&&!allocations);}
  reset();path_fail=1;assert(J413NextEfiOption(&o)==1&&opens==closes&&!allocations);
  reset();init_fail=1;assert(J413NextEfiOption(&o)==1&&opens==closes&&!allocations);
  reset();read_fail=1;assert(J413NextEfiOption(&o)==1&&opens==closes&&!allocations);
- reset();assert(J413EfiSamePath(L"\\odd\\FILE.EFI",L"\\odd\\file.efi"));
- // Truncated DOS/PE and invalid offset are rejected before a full loader is invoked.
- struct Node bad={L"bad",0,3,NULL,0};EFI_FILE_PROTOCOL *f=make_file(&bad,&bad);assert(!J413EfiApplication(f,L""));f->Close(f);assert(!allocations);
+ reset();assert(J413EfiSamePath(L"\\EFI\\BOOT\\BOOTAA64.EFI",L"\\efi\\boot\\bootaa64.efi"));
+ return 0;}
+''')
+
+ def test_case_insensitive_exact_components_with_bounds_and_arm64_filter(self):
+  self.run_c(PRELUDE+HEADER.read_text()+r'''
+static void reset(void){assert(!allocations);mEfiHead=mEfiTail=NULL;mEfiCount=0;mEfiScanned=0;malformed=grow=read_fail=unterminated=oversize=pe32=short_read=0;opens=closes=scans=directory_reads=other_opens=0;first[0].name=L"eFi";efi[0].name=L"bOoT";boot[0].name=L"bootAa64.eFi";boot[0].kind=0;}
+int main(void){EFI_BOOT_MANAGER_LOAD_OPTION o;
+ reset();assert(J413NextEfiOption(&o)==0&&!wcscmp(o.Description,L"\\eFi\\bOoT\\bootAa64.eFi"));
+ assert(J413NextEfiOption(&o)==1&&directory_reads>=3&&opens==closes&&!allocations&&!other_opens);
+ reset();grow=1;assert(J413NextEfiOption(&o)==0);assert(J413NextEfiOption(&o)==1&&opens==closes&&!allocations&&!other_opens);
+ for(int kind=1;kind<=3;kind++){reset();boot[0].kind=kind;assert(J413NextEfiOption(&o)==1&&opens==closes&&!allocations&&!other_opens);}
+ reset();pe32=1;assert(J413NextEfiOption(&o)==1&&opens==closes&&!allocations);
+ reset();short_read=1;assert(J413NextEfiOption(&o)==1&&opens==closes&&!allocations);
+ reset();malformed=1;assert(J413NextEfiOption(&o)==1&&opens==closes&&!allocations);
+ reset();unterminated=1;assert(J413NextEfiOption(&o)==1&&opens==closes&&!allocations);
+ reset();oversize=1;assert(J413NextEfiOption(&o)==1&&opens==closes&&!allocations);
+ reset();boot[0].name=L"ACPIview.efi";assert(J413NextEfiOption(&o)==1&&opens==closes&&!allocations&&!other_opens);
  return 0;}
 ''')
 

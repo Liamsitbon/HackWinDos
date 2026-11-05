@@ -1,0 +1,53 @@
+{
+  "timestamp_utc": "2026-11-05T12:16:22.931135+00:00",
+  "usb": {
+    "IORegistryEntryName": "Root",
+    "IOObjectClass": "IORegistryEntry",
+    "children": [
+      {
+        "IORegistryEntryName": "AppleT8112USBXHCI",
+        "IOObjectClass": "AppleT8112USBXHCI",
+        "children": [
+          {
+            "IORegistryEntryName": " SanDisk 3.2Gen1",
+            "IOObjectClass": "IOUSBHostDevice",
+            "idVendor": 1921,
+            "idProduct": 21909,
+            "bcdUSB": 800,
+            "UsbLinkSpeed": 5000000000,
+            "USBSpeed": 4,
+            "children": []
+          }
+        ]
+      },
+      {
+        "IORegistryEntryName": "AppleT8112USBXHCI",
+        "IOObjectClass": "AppleT8112USBXHCI",
+        "children": [
+          {
+            "IORegistryEntryName": "USB3.1 Hub",
+            "IOObjectClass": "IOUSBHostDevice",
+            "idVendor": 1507,
+            "idProduct": 1574,
+            "bcdUSB": 800,
+            "UsbLinkSpeed": 5000000000,
+            "USBSpeed": 4,
+            "children": []
+          },
+          {
+            "IORegistryEntryName": "USB2.1 Hub",
+            "IOObjectClass": "IOUSBHostDevice",
+            "idVendor": 1507,
+            "idProduct": 1552,
+            "bcdUSB": 528,
+            "UsbLinkSpeed": 480000000,
+            "USBSpeed": 3,
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  "external_disks": "/dev/disk2 (external, physical):\n   #:                       TYPE NAME                    SIZE       IDENTIFIER\n   0:      GUID_partition_scheme                        *61.5 GB    disk2\n   1:                        EFI EFI                     209.7 MB   disk2s1\n   2:       Microsoft Basic Data M2BOOT                  2.0 GB     disk2s2\n   3:       Microsoft Basic Data WININSTALL              59.3 GB    disk2s3\n\n",
+  "internal_disks": "/dev/disk0 (internal, physical):\n   #:                       TYPE NAME                    SIZE       IDENTIFIER\n   0:      GUID_partition_scheme                        *251.0 GB   disk0\n   1:             Apple_APFS_ISC Container disk1         524.3 MB   disk0s1\n   2:                 Apple_APFS Container disk4         245.1 GB   disk0s2\n   3:        Apple_APFS_Recovery Container disk3         5.4 GB     disk0s5\n\n/dev/disk4 (synthesized):\n   #:                       TYPE NAME                    SIZE       IDENTIFIER\n   0:      APFS Container Scheme -                      +245.1 GB   disk4\n                                 Physical Store disk0s2\n   1:                APFS Volume Macintosh HD            19.1 GB    disk4s1\n   2:              APFS Snapshot com.apple.os.update-... 19.1 GB    disk4s1s1\n   3:                APFS Volume Preboot                 20.7 GB    disk4s2\n   4:                APFS Volume Recovery                3.0 GB     disk4s3\n   5:                APFS Volume Data                    152.9 GB   disk4s5\n   6:                APFS Volume VM                      1.1 GB     disk4s6\n\n"
+}

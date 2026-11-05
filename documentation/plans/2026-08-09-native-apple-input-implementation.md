@@ -169,7 +169,7 @@ Expected: PASS.
 Run during an assisted m1n1 proxy session:
 
 ```bash
-M1N1DEVICE=/dev/cu.usbmodemPROXY \
+M1N1DEVICE=<CONSOLE_DEVICE> \
   proxyenv/bin/python tools/apple_input_inventory.py \
   --output .local/apple-input/j313-live-inventory.json
 ```

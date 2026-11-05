@@ -1,0 +1,49 @@
+{
+  "created_utc": "2026-11-05T13:31:51.626986+00:00",
+  "partition_uuid": "9E7B3C33-1721-4EBF-8C9C-A5D4A798B224",
+  "native_boot_qualified": false,
+  "images": {
+    "boot.wim": [
+      {
+        "index": "1",
+        "name": "Microsoft Windows PE (arm64)",
+        "architecture": "ARM64"
+      },
+      {
+        "index": "2",
+        "name": "Microsoft Windows Setup (arm64)",
+        "architecture": "ARM64"
+      }
+    ],
+    "install.wim": [
+      {
+        "index": "1",
+        "name": "Windows 11 Home",
+        "architecture": "ARM64"
+      },
+      {
+        "index": "2",
+        "name": "Windows 11 Home Single Language",
+        "architecture": "ARM64"
+      },
+      {
+        "index": "3",
+        "name": "Windows 11 Pro",
+        "architecture": "ARM64"
+      }
+    ]
+  },
+  "split_install_images": {
+    "install.swm": {
+      "size": 3981883451,
+      "sha256": "ab8d10d92381aff7a2af4c26da8e022e955a6a713a2e038c79c1bbcad3e2fde1"
+    },
+    "install2.swm": {
+      "size": 3604356140,
+      "sha256": "46fe62cfb0d328ade9ae6d56945db830a48a6ffc14dd83ae50670861c0280d9e"
+    }
+  },
+  "source_install_wim_sha256": "374ad0c29447289c0c87cf38e74ca12b7d51520182eb3a57b826dc5c2ac2bda5",
+  "copied_files": 964,
+  "firmware_sha256": "bcfedfbfe7695014503fdc64c871f9a490f91be6cef927002ec2f3dcbcbef1d6"
+}

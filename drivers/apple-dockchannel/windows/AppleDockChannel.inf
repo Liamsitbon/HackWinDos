@@ -1,0 +1,57 @@
+[Version]
+Signature="$WINDOWS NT$"
+Class=HIDClass
+ClassGuid={745A17A0-74D3-11D0-B6FE-00A0C90F57DA}
+Provider=%ProviderName%
+DriverVer=10/24/2026,1.0.0.0
+CatalogFile=AppleDockChannel.cat
+PnpLockdown=1
+
+[DestinationDirs]
+DefaultDestDir = 13
+
+[Manufacturer]
+%ProviderName%=AppleDockChannelModels,NTarm64.10.0...22000
+
+[AppleDockChannelModels.NTarm64.10.0...22000]
+%AppleDockChannel.DeviceDesc%=AppleDockChannel_Install,ACPI\APPL0008
+
+[AppleDockChannel_Install.NT]
+CopyFiles=AppleDockChannel_CopyFiles
+
+[AppleDockChannel_CopyFiles]
+AppleDockChannel.sys
+
+[AppleDockChannel_Install.NT.HW]
+AddReg=AppleDockChannel_Hardware
+
+[AppleDockChannel_Hardware]
+HKR,,LowerFilters,0x00010000,"Vhf"
+
+[AppleDockChannel_Install.NT.Services]
+AddService=AppleDockChannel,0x00000002,AppleDockChannel_Service
+
+[AppleDockChannel_Service]
+DisplayName=%AppleDockChannel.ServiceDesc%
+ServiceType=1
+StartType=3
+ErrorControl=1
+ServiceBinary=%13%\AppleDockChannel.sys
+
+[AppleDockChannel_Install.NT.Wdf]
+KmdfService=AppleDockChannel,AppleDockChannel_Wdf
+
+[AppleDockChannel_Wdf]
+KmdfLibraryVersion=1.15
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+AppleDockChannel.sys = 1,,
+
+[Strings]
+ProviderName = "Windows on Apple Silicon Project"
+DiskName = "Apple DockChannel Input Driver Installation Disk"
+AppleDockChannel.DeviceDesc = "Apple DockChannel Input Transport (Keyboard & Trackpad)"
+AppleDockChannel.ServiceDesc = "Apple DockChannel Input Service"

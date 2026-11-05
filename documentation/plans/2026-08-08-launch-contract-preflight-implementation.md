@@ -355,7 +355,7 @@ scripts/capture-assisted-contract.sh \
   --public-root /Users/pavel/public_windows \
   --reference-output .local/contracts/assisted-reference/dry-run \
   --collector-output .local/contracts/assisted-collector/dry-run \
-  --device /dev/cu.usbmodemC02HDNCCQ6L41 \
+  --device <CONSOLE_DEVICE> \
   --dry-run
 ```
 

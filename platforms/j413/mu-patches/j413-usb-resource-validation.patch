@@ -8,30 +8,35 @@ index 2d14bfa..1bba9cc 100644
  [Protocols]
 +  gJ413WindowsSetupProtocolGuid = { 0x96cda453, 0xf830, 0x4e50, { 0x88, 0xa4, 0xf4, 0x5e, 0xd9, 0x24, 0x61, 0x0b } }
 +  gJ413UsbDartReadyProtocolGuid = { 0xb85a7c91, 0x7a1b, 0x466e, { 0xa8, 0x4c, 0x2f, 0x95, 0x0b, 0xdf, 0x43, 0x11 } }
- 
+
  [PcdsFixedAtBuild.common]
    gAppleSiliconPkgTokenSpaceGuid.PcdAppleSocIdentifier|0|UINT32|0x0000389e
 diff --git a/Silicon/Apple/AppleSiliconPkg/Drivers/AppleDartIoMmuDxe/AppleDartIoMmuDxe.c b/Silicon/Apple/AppleSiliconPkg/Drivers/AppleDartIoMmuDxe/AppleDartIoMmuDxe.c
-index dac1c93..faf89fb 100644
+index dac1c93..573e571 100644
 --- a/Silicon/Apple/AppleSiliconPkg/Drivers/AppleDartIoMmuDxe/AppleDartIoMmuDxe.c
 +++ b/Silicon/Apple/AppleSiliconPkg/Drivers/AppleDartIoMmuDxe/AppleDartIoMmuDxe.c
-@@ -43,6 +43,9 @@
+@@ -43,8 +43,14 @@
  #include <Library/AppleDTLib.h>
- 
+
  #include <Protocol/IoMmu.h>
 +#ifdef J413_BOOT_CONTRACT
 +#include <Protocol/J413UsbDartReady.h>
 +#endif
- 
+
  #include <Drivers/AppleDartIoMmuDxe.h>
- 
-@@ -293,25 +296,31 @@ EDKII_IOMMU_PROTOCOL mAppleDartIoMmuProtocol = {
++#ifdef J413_BOOT_CONTRACT
++#include <Library/J413UsbDartReadback.h>
++#endif
+
+ APPLE_DART_INFO DartInfo[FixedPcdGet32(PcdAppleNumDwc3Controllers) * 2];
+
+@@ -293,25 +299,31 @@ EDKII_IOMMU_PROTOCOL mAppleDartIoMmuProtocol = {
      AppleDartIoMmuFreeBuffer,
  };
- 
+
 -STATIC VOID AppleDartT8020TlbFlush(VOID *DartInformation) {
 +STATIC EFI_STATUS AppleDartT8020TlbFlush(VOID *DartInformation) {
- 
+
      APPLE_DART_INFO *DartInfoStruct = (APPLE_DART_INFO *)DartInformation;
      __asm__("dsb sy");
      //SpeculationBarrier();
@@ -46,7 +51,7 @@ index dac1c93..faf89fb 100644
      }
 +    return EFI_TIMEOUT;
  }
- 
+
 -STATIC VOID AppleDartT8110TlbFlush(VOID *DartInformation) {
 +STATIC EFI_STATUS AppleDartT8110TlbFlush(VOID *DartInformation) {
      APPLE_DART_INFO *DartInfoStruct = (APPLE_DART_INFO *)DartInformation;
@@ -62,9 +67,9 @@ index dac1c93..faf89fb 100644
      }
 +    return EFI_TIMEOUT;
  }
- 
+
  EFI_STATUS EFIAPI 
-@@ -321,8 +330,11 @@ AppleDartIoMmuDxeInitialize(
+@@ -321,8 +333,11 @@ AppleDartIoMmuDxeInitialize(
  )
  {
      UINT32 Midr;
@@ -78,7 +83,7 @@ index dac1c93..faf89fb 100644
      UINT32 DartIndex = 0;
      UINT32 Params4; // U-Boot does this
      // PHYSICAL_ADDRESS Address;
-@@ -353,10 +365,9 @@ AppleDartIoMmuDxeInitialize(
+@@ -353,10 +368,9 @@ AppleDartIoMmuDxeInitialize(
      // bail out if not found.
      //
      Midr = ArmReadMidr();
@@ -89,11 +94,11 @@ index dac1c93..faf89fb 100644
 -      ASSERT(FALSE);
        return EFI_NOT_FOUND;
      }
- 
-@@ -384,10 +395,18 @@ AppleDartIoMmuDxeInitialize(
+
+@@ -384,10 +398,18 @@ AppleDartIoMmuDxeInitialize(
              continue;
          }
- 
+
 -        dt_node_reg(DartNode[DartNodeIndex], 0, &DartReg[DartIndex++], NULL);
 -        DEBUG((DEBUG_INFO, "DART reg[0] for %a is 0x%llx \n", DartNodeName, DartReg[DartIndex - 1]));
 -        dt_node_reg(DartNode[DartNodeIndex], 1, &DartReg[DartIndex++], NULL);
@@ -111,12 +116,12 @@ index dac1c93..faf89fb 100644
 +        DartReg[DartIndex++] = FirstBase;
 +        DartReg[DartIndex++] = SecondBase;
      }
- 
- 
-@@ -417,6 +436,17 @@ AppleDartIoMmuDxeInitialize(
+
+
+@@ -417,6 +439,17 @@ AppleDartIoMmuDxeInitialize(
          size_t CompatibleStrLength = 0;
          CompatibleStr = dt_node_prop(DartNode[DartIndex / 2], "compatible", &CompatibleStrLength);
- 
+
 +        // Bound comparisons to the supplied property; never classify an unknown
 +        // or missing compatible string as the older register layout.
 +        if(CompatibleStr == NULL || CompatibleStrLength < 11 ||
@@ -131,7 +136,7 @@ index dac1c93..faf89fb 100644
          if( !AsciiStrCmp(CompatibleStr ,"dart,t8110")) {
              //
              // T8110 compatible DARTs have different setup.
-@@ -424,6 +454,10 @@ AppleDartIoMmuDxeInitialize(
+@@ -424,6 +457,10 @@ AppleDartIoMmuDxeInitialize(
              DEBUG((DEBUG_INFO, "%a - Setting up T8110-compatible DART\n", __FUNCTION__));
              Params4 = MmioRead32(DartInfo[DartIndex].BaseAddress + DART_T8110_PARAMS4);
              DartInfo[DartIndex].Nsid = Params4 & DART_T8110_PARAMS4_NSID_MASK;
@@ -142,22 +147,29 @@ index dac1c93..faf89fb 100644
              DartInfo[DartIndex].Nttbr = 1;
              DartInfo[DartIndex].SidEnableBase = DART_T8110_SID_ENABLE_BASE;
              DartInfo[DartIndex].TcrBase = DART_T8110_TCR_BASE;
-@@ -465,7 +499,11 @@ AppleDartIoMmuDxeInitialize(
+@@ -465,7 +502,11 @@ AppleDartIoMmuDxeInitialize(
              }
          }
- 
+
 -        DartInfo[DartIndex].TlbFlush((VOID *)&DartInfo[DartIndex]);
 +        EFI_STATUS FlushStatus = DartInfo[DartIndex].TlbFlush((VOID *)&DartInfo[DartIndex]);
 +        if(EFI_ERROR(FlushStatus)) {
 +            DEBUG((DEBUG_ERROR, "UEFI DART: bank %d flush timed out\n", DartIndex));
 +            return FlushStatus;
 +        }
- 
+
          Params2 = MmioRead32(DartInfo[DartIndex].BaseAddress + DART_PARAMS2);
          if((Params2 & DART_PARAMS2_BYPASS_SUPPORT) != 0) {
-@@ -474,6 +512,9 @@ AppleDartIoMmuDxeInitialize(
+@@ -473,7 +514,16 @@ AppleDartIoMmuDxeInitialize(
+             for(sid = 0; sid < DartInfo[DartIndex].Nsid; sid++) {
                  MmioWrite32(DartInfo[DartIndex].BaseAddress + DART_TCR(DartInfo[DartIndex], sid), DartInfo[DartIndex].TcrBypass);
              }
++#ifdef J413_BOOT_CONTRACT
++            EFI_STATUS ReadbackStatus = J413UsbDartVerifyBypass(&DartInfo[DartIndex], DartIndex);
++            if(EFI_ERROR(ReadbackStatus)) {
++                return ReadbackStatus;
++            }
++#endif
              DartInfo[DartIndex].BypassMode = TRUE;
 +#ifdef J413_BOOT_CONTRACT
 +            ReadyBanks |= 1U << DartIndex;
@@ -165,7 +177,7 @@ index dac1c93..faf89fb 100644
              //
              // Bypass mode means the controllers can just DMA right into physical memory so we skip installing the IOMMU protocol.
              //
-@@ -525,6 +566,17 @@ AppleDartIoMmuDxeInitialize(
+@@ -525,6 +575,17 @@ AppleDartIoMmuDxeInitialize(
          //                 NULL
          //                 );
      }
@@ -189,11 +201,11 @@ index c95c52f..65a4081 100644
 --- a/Silicon/Apple/AppleSiliconPkg/Drivers/AppleDartIoMmuDxe/AppleDartIoMmuDxe.inf
 +++ b/Silicon/Apple/AppleSiliconPkg/Drivers/AppleDartIoMmuDxe/AppleDartIoMmuDxe.inf
 @@ -62,6 +62,7 @@
- 
+
  [Protocols]
    gEdkiiIoMmuProtocolGuid # Produces
 +  gJ413UsbDartReadyProtocolGuid ## PRODUCES
- 
+
  [Depex]
    TRUE
 \ No newline at end of file
@@ -203,18 +215,18 @@ index 5d6d810..a8582ea 100644
 +++ b/Silicon/Apple/AppleSiliconPkg/Drivers/AppleUsbTypeCBringupDxe/AppleUsbTypeCBringupDxe.c
 @@ -40,6 +40,9 @@
  #include <Library/AppleDTLib.h>
- 
+
  #include <Drivers/AppleUsbTypeCBringupDxe.h>
 +#ifdef J413_BOOT_CONTRACT
 +#include <Protocol/J413UsbDartReady.h>
 +#endif
- 
+
  //
  // This driver is just a stub to bringup register the DWC3 controller(s) as a non-discoverable XHCI controller(s), which
 @@ -126,7 +129,8 @@ STATIC EFI_STATUS Dwc3XhciCoreInit(IN DWC3_CONTROLLER *Controller)
    UINTN Dwc3HwParams1Reg;
    Dwc3Revision = MmioRead32((UINTN)&Controller->GSnpsId);
- 
+
 -  if((Dwc3Revision & DWC3_GSNPSID_MASK) != DWC3_SYNOPSYS_ALT_ID) {
 +  if((Dwc3Revision & DWC3_GSNPSID_MASK) != DWC3_SYNOPSYS_ID &&
 +     (Dwc3Revision & DWC3_GSNPSID_MASK) != DWC3_SYNOPSYS_ALT_ID) {
@@ -249,7 +261,7 @@ index 5d6d810..a8582ea 100644
 -    return (VOID *)EFI_DEVICE_ERROR;
 +    return Status;
    }
- 
+
    Dwc3AppleSetupCio(Dwc3ControllerBaseReg);
 @@ -201,7 +206,7 @@ AppleUsbTypeCBringupDxeInitializeUsbController(IN UINTN Dwc3ControllerBaseReg)
    //
@@ -259,7 +271,7 @@ index 5d6d810..a8582ea 100644
 +  return Status;
    
  }
- 
+
 @@ -214,7 +219,7 @@ AppleUsbTypeCBringupDxeBringupCallback(IN EFI_EVENT Event, IN VOID *Context)
    UINT32 NumDwc3Controllers;
    UINT64 Dwc3ControllerBaseAddr;
@@ -270,9 +282,9 @@ index 5d6d810..a8582ea 100644
    // Close the event so that we don't have duplicate events floating around.
    //
 @@ -222,6 +227,14 @@ AppleUsbTypeCBringupDxeBringupCallback(IN EFI_EVENT Event, IN VOID *Context)
- 
+
    DEBUG((DEBUG_INFO, "AppleUsbTypeCBringupDxeBringupCallback started\n"));
- 
+
 +#ifdef J413_BOOT_CONTRACT
 +  J413_USB_DART_READY *Ready = NULL;
 +  Status = gBS->LocateProtocol(&gJ413UsbDartReadyProtocolGuid, NULL, (VOID **)&Ready);
@@ -282,12 +294,12 @@ index 5d6d810..a8582ea 100644
 +  }
 +#endif
    NumDwc3Controllers = PcdGet32(PcdAppleNumDwc3Controllers);
- 
+
    for(UINT32 Dwc3Index = 0; Dwc3Index < NumDwc3Controllers; Dwc3Index++) {
 @@ -246,22 +259,43 @@ AppleUsbTypeCBringupDxeBringupCallback(IN EFI_EVENT Event, IN VOID *Context)
        continue;
      }
- 
+
 -    dt_node_reg(Dwc3Node, 0, &Dwc3ControllerBaseAddr, NULL);
 -
 -    Dwc3ControllerRegSize = 0x100000;//TODO: get from ADT
@@ -342,7 +354,7 @@ index ef0c6df..6a0ee27 100644
 @@ -63,5 +63,8 @@
  [Guids]
    gEfiEndOfDxeEventGroupGuid
- 
+
 +[Protocols]
 +  gJ413UsbDartReadyProtocolGuid ## CONSUMES
 +
@@ -361,7 +373,7 @@ index b89854c..931fede 100644
 -	void (*TlbFlush)(VOID *DartInfoStruct);
 +	EFI_STATUS (*TlbFlush)(VOID *DartInfoStruct);
  } APPLE_DART_INFO;
- 
+
  typedef struct AppleDartMapping {
 @@ -95,7 +95,7 @@ typedef struct AppleDartMapping {
  #define  DART_T8110_PARAMS4_NSID_MASK		(0x1ff << 0)

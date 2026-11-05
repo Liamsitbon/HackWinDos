@@ -1,0 +1,58 @@
+[
+  {
+    "path": "/Volumes/M2BOOT/efi/boot/bootaa64.efi",
+    "size": 3120648,
+    "machine": "0xaa64",
+    "magic": "0x20b",
+    "subsystem": 10
+  },
+  {
+    "path": "/Volumes/M2BOOT/efi/microsoft/boot/cdboot.efi",
+    "size": 968096,
+    "machine": "0xaa64",
+    "magic": "0x20b",
+    "subsystem": 10
+  },
+  {
+    "path": "/Volumes/M2BOOT/efi/microsoft/boot/cdboot_noprompt.efi",
+    "size": 968096,
+    "machine": "0xaa64",
+    "magic": "0x20b",
+    "subsystem": 10
+  },
+  {
+    "path": "/Volumes/WININSTALL/bootmgfw.efi",
+    "size": 3120648,
+    "machine": "0xaa64",
+    "magic": "0x20b",
+    "subsystem": 10
+  },
+  {
+    "path": "/Volumes/WININSTALL/bootmgr.efi",
+    "size": 3099128,
+    "machine": "0xaa64",
+    "magic": "0x20b",
+    "subsystem": 16
+  },
+  {
+    "path": "/Volumes/WININSTALL/efi/boot/bootaa64.efi",
+    "size": 3120648,
+    "machine": "0xaa64",
+    "magic": "0x20b",
+    "subsystem": 10
+  },
+  {
+    "path": "/Volumes/WININSTALL/efi/microsoft/boot/cdboot_noprompt.efi",
+    "size": 968096,
+    "machine": "0xaa64",
+    "magic": "0x20b",
+    "subsystem": 10
+  },
+  {
+    "path": "/Volumes/WININSTALL/efi/microsoft/boot/cdboot.efi",
+    "size": 968096,
+    "machine": "0xaa64",
+    "magic": "0x20b",
+    "subsystem": 10
+  }
+]

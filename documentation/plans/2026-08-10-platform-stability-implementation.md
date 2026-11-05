@@ -358,8 +358,8 @@ does not publish that name. Then run with the actual two USB serial device paths
 
 ```bash
 scripts/capture-stability.sh \
-  --console /dev/cu.usbmodemCONSOLE \
-  --vuart /dev/cu.usbmodemVUART \
+  --console <CONSOLE_DEVICE> \
+  --vuart <CONSOLE_DEVICE> \
   --host windows-m1.local \
   --output .local/platform-stability
 ```

@@ -1,0 +1,12 @@
+{
+  "M2BOOT": {
+    "path": "/Volumes/M2BOOT/EFI/BOOT/BOOTAA64.EFI",
+    "exists": true,
+    "sha256": "fae47d78487e781aa06466775cb461adeb7ff7f887fe2c15295bb2eb4f4954e1"
+  },
+  "WININSTALL": {
+    "path": "/Volumes/WININSTALL/EFI/BOOT/BOOTAA64.EFI",
+    "exists": true,
+    "sha256": "fae47d78487e781aa06466775cb461adeb7ff7f887fe2c15295bb2eb4f4954e1"
+  }
+}

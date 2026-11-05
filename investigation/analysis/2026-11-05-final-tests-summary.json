@@ -1,0 +1,15 @@
+{
+  "current_summary": [
+    "Ran 1611 tests in 287.367s",
+    "FAILED (failures=90, errors=55, skipped=42)"
+  ],
+  "prior_summary": [
+    "Ran 1583 tests in 128.509s",
+    "FAILED (failures=91, errors=55, skipped=42)"
+  ],
+  "new_failure_headers": [],
+  "removed_failure_headers": [
+    "test_public_tooling_is_english_and_location_independent (test_repository_hygiene.RepositoryHygieneTests.test_public_tooling_is_english_and_location_independent)"
+  ],
+  "scope": "Full root suite; no hardware qualification. Focused J413 suite 92 tests: 91 pass and one skip. Actual WDK linkage pending GitHub CI."
+}

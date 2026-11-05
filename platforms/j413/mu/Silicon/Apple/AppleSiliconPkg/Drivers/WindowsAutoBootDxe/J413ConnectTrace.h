@@ -5,6 +5,30 @@
 #define J413_CONNECT_TRACE_H
 #include <Protocol/NonDiscoverableDevice.h>
 #include <Guid/NonDiscoverableDevice.h>
+#include <Protocol/PciRootBridgeIo.h>
+
+STATIC EFI_STATUS J413ConnectBootNvme(VOID)
+{
+  EFI_HANDLE *Handles = NULL;
+  UINTN Count = 0;
+  EFI_STATUS Result = EFI_NOT_FOUND;
+  EFI_STATUS Status = gBS->LocateHandleBuffer(ByProtocol,
+      &gEfiPciRootBridgeIoProtocolGuid, NULL, &Count, &Handles);
+  Print(L"UEFI NVMe: PCI root lookup %r; roots %u\r\n", Status, Count);
+  if (!EFI_ERROR(Status) && Handles != NULL) {
+    // J413 exposes its synthetic NVMe at the registered PCI root. The platform
+    // connect list is empty; do not wait until Shell/global ConnectAll to bind it.
+    for (UINTN Index = 0; Index < Count; Index++) {
+      Status = gBS->ConnectController(Handles[Index], NULL, NULL, TRUE);
+      Print(L"UEFI NVMe: root connection returned %r\r\n", Status);
+      if (!EFI_ERROR(Status) || Result != EFI_SUCCESS) Result = Status;
+    }
+  } else if (EFI_ERROR(Status)) {
+    Result = Status;
+  }
+  if (Handles != NULL) FreePool(Handles);
+  return Result;
+}
 
 STATIC EFI_STATUS J413ConnectBootUsb(VOID)
 {

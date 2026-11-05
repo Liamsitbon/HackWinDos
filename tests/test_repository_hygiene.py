@@ -21,6 +21,15 @@ def tracked_files():
 
 
 class RepositoryHygieneTests(unittest.TestCase):
+    def test_public_files_do_not_embed_a_specific_console_serial_endpoint(self):
+        expression = re.compile(rb'/dev/(?:cu|tty)\.usbmodem[0-9A-Za-z]{5,}')
+        offenders = []
+        for relative in tracked_files():
+            path = ROOT/relative
+            if path.is_file() and expression.search(path.read_bytes()):
+                offenders.append(str(relative))
+        self.assertEqual([], offenders)
+
     def test_tracked_files_exclude_private_runtime_artifacts(self):
         forbidden_prefixes = (".idea/", ".local/")
         forbidden_exact = {"guest.pid", "logview.out", "single-core-boot.hv.txt"}

@@ -1,0 +1,31 @@
+{
+  "timestamp_utc": "2026-11-05T13:13:36.633349+00:00",
+  "source_state": {
+    "root": {
+      "commit": "015b78fdfd58b5f5884ae260fd6e2f96c11c8da7",
+      "branch": "master",
+      "diff_sha256": "59aadb9507f132f06032e2a96d2e3d7cfb03decc7c45a68f6178a22e10e4c8c0"
+    },
+    "m1n1": {
+      "commit": "9cd80ac652ac404e92ae279deeaec8c629d7d184",
+      "branch": "",
+      "diff_sha256": "c21fa5b54fdd085ed09614abdef38fc86697c9a5efc13949a420c9928b8ee6a8"
+    },
+    "Mu": {
+      "commit": "8b4dc4b4e3ff8606d0af36163acf9de79b7b4737",
+      "branch": "",
+      "diff_sha256": "c22d4bed55e02901e430fe2539834743377bf544a095141477fd68cddab9b96a"
+    }
+  },
+  "target": {
+    "DeviceIdentifier": "disk5s2",
+    "DiskUUID": "9E7B3C33-1721-4EBF-8C9C-A5D4A798B224",
+    "VolumeUUID": "C6CC8873-7C69-3140-A041-7DC326459F75",
+    "MountPoint": "/Volumes/J413SETUP",
+    "FilesystemType": "msdos",
+    "ParentWholeDisk": "disk5",
+    "DeviceProtocol": null,
+    "VirtualOrPhysical": null,
+    "TotalSize": 12660711424
+  }
+}

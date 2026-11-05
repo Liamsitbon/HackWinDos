@@ -1,0 +1,264 @@
+[
+  {
+    "IOObjectClass": "AppleARMIODevice",
+    "IORegistryEntryChildren": [
+      {
+        "IOObjectClass": "AppleT8112USBXHCI",
+        "IORegistryEntryChildren": [
+          {
+            "IOObjectClass": "AppleUSB20XHCIARMPort",
+            "IORegistryEntryChildren": [
+              {
+                "IOObjectClass": "IOUSBHostDevice",
+                "IORegistryEntryChildren": [
+                  {
+                    "IOObjectClass": "AppleUSBHostCompositeDevice",
+                    "IORegistryEntryName": "AppleUSBHostCompositeDevice",
+                    "bDeviceClass": 0,
+                    "bDeviceSubClass": 0
+                  },
+                  {
+                    "IOObjectClass": "IOUSBHostInterface",
+                    "IORegistryEntryChildren": [
+                      {
+                        "IOObjectClass": "IOUSBMassStorageInterfaceNub",
+                        "IORegistryEntryChildren": [
+                          {
+                            "IOObjectClass": "IOUSBMassStorageDriverNub",
+                            "IORegistryEntryChildren": [
+                              {
+                                "IOObjectClass": "IOUSBMassStorageDriver",
+                                "IORegistryEntryChildren": [
+                                  {
+                                    "IOObjectClass": "IOSCSILogicalUnitNub",
+                                    "IORegistryEntryChildren": [
+                                      {
+                                        "IOObjectClass": "IOSCSIPeripheralDeviceType00",
+                                        "IORegistryEntryChildren": [
+                                          {
+                                            "IOObjectClass": "IOBlockStorageServices",
+                                            "IORegistryEntryChildren": [
+                                              {
+                                                "IOObjectClass": "IOBlockStorageDriver",
+                                                "IORegistryEntryChildren": [
+                                                  {
+                                                    "IOObjectClass": "IOMedia",
+                                                    "IORegistryEntryChildren": [
+                                                      {
+                                                        "IOObjectClass": "IOMediaBSDClient",
+                                                        "IORegistryEntryName": "IOMediaBSDClient"
+                                                      },
+                                                      {
+                                                        "IOObjectClass": "IOGUIDPartitionScheme",
+                                                        "IORegistryEntryChildren": [
+                                                          {
+                                                            "IOObjectClass": "IOMedia",
+                                                            "IORegistryEntryChildren": [
+                                                              {
+                                                                "IOObjectClass": "IOMediaBSDClient",
+                                                                "IORegistryEntryName": "IOMediaBSDClient"
+                                                              }
+                                                            ],
+                                                            "IORegistryEntryName": "EFI System Partition"
+                                                          },
+                                                          {
+                                                            "IOObjectClass": "IOMedia",
+                                                            "IORegistryEntryChildren": [
+                                                              {
+                                                                "IOObjectClass": "IOMediaBSDClient",
+                                                                "IORegistryEntryName": "IOMediaBSDClient"
+                                                              }
+                                                            ],
+                                                            "IORegistryEntryName": "Untitled 2"
+                                                          },
+                                                          {
+                                                            "IOObjectClass": "IOMedia",
+                                                            "IORegistryEntryChildren": [
+                                                              {
+                                                                "IOObjectClass": "IOMediaBSDClient",
+                                                                "IORegistryEntryName": "IOMediaBSDClient"
+                                                              }
+                                                            ],
+                                                            "IORegistryEntryName": "Untitled 3"
+                                                          }
+                                                        ],
+                                                        "IORegistryEntryName": "IOGUIDPartitionScheme"
+                                                      }
+                                                    ],
+                                                    "IORegistryEntryName": "USB SanDisk 3.2Gen1 Media"
+                                                  }
+                                                ],
+                                                "IORegistryEntryName": "IOBlockStorageDriver"
+                                              }
+                                            ],
+                                            "IORegistryEntryName": "IOBlockStorageServices"
+                                          }
+                                        ],
+                                        "IORegistryEntryName": "IOSCSIPeripheralDeviceType00"
+                                      }
+                                    ],
+                                    "IORegistryEntryName": "IOSCSILogicalUnitNub"
+                                  }
+                                ],
+                                "IORegistryEntryName": "IOUSBMassStorageDriver",
+                                "bInterfaceProtocol": 80
+                              }
+                            ],
+                            "IORegistryEntryName": "IOUSBMassStorageDriverNub",
+                            "USB Product Name": " SanDisk 3.2Gen1",
+                            "bConfigurationValue": 1,
+                            "bInterfaceClass": 8,
+                            "bInterfaceProtocol": 80,
+                            "bInterfaceSubClass": 6,
+                            "idProduct": 21909,
+                            "idVendor": 1921
+                          }
+                        ],
+                        "IORegistryEntryName": "IOUSBMassStorageInterfaceNub",
+                        "USB Product Name": " SanDisk 3.2Gen1",
+                        "bConfigurationValue": 1,
+                        "bInterfaceClass": 8,
+                        "bInterfaceProtocol": 80,
+                        "bInterfaceSubClass": 6,
+                        "bNumConfigurations": 1,
+                        "idProduct": 21909,
+                        "idVendor": 1921,
+                        "locationID": 17825792
+                      }
+                    ],
+                    "IORegistryEntryName": "IOUSBHostInterface",
+                    "USB Product Name": " SanDisk 3.2Gen1",
+                    "USB Vendor Name": " USB",
+                    "USBSpeed": 3,
+                    "bConfigurationValue": 1,
+                    "bInterfaceClass": 8,
+                    "bInterfaceProtocol": 80,
+                    "bInterfaceSubClass": 6,
+                    "idProduct": 21909,
+                    "idVendor": 1921,
+                    "locationID": 17825792
+                  },
+                  {
+                    "IOObjectClass": "AppleUSBHostDeviceUserClient",
+                    "IORegistryEntryName": "ChatGPT"
+                  }
+                ],
+                "IORegistryEntryName": " SanDisk 3.2Gen1",
+                "USB Product Name": " SanDisk 3.2Gen1",
+                "USB Vendor Name": " USB",
+                "USBSpeed": 3,
+                "UsbLinkSpeed": 480000000,
+                "UsbPowerSinkAllocation": 224,
+                "bDeviceClass": 0,
+                "bDeviceProtocol": 0,
+                "bDeviceSubClass": 0,
+                "bMaxPacketSize0": 64,
+                "bNumConfigurations": 1,
+                "bcdUSB": 528,
+                "idProduct": 21909,
+                "idVendor": 1921,
+                "locationID": 17825792
+              }
+            ],
+            "IORegistryEntryName": "usb-drd1-port-hs",
+            "locationID": 17825792
+          },
+          {
+            "IOObjectClass": "AppleUSB30XHCIARMPort",
+            "IORegistryEntryName": "usb-drd1-port-ss",
+            "locationID": 18874368
+          }
+        ],
+        "IORegistryEntryName": "AppleT8112USBXHCI",
+        "locationID": 16777216
+      },
+      {
+        "IOObjectClass": "AppleT8112USBXDCI",
+        "IORegistryEntryChildren": [
+          {
+            "IOObjectClass": "IOUSBDeviceConfigurator",
+            "IORegistryEntryName": "IOUSBDeviceConfigurator"
+          },
+          {
+            "IOObjectClass": "IOUSBDeviceInterface",
+            "IORegistryEntryChildren": [
+              {
+                "IOObjectClass": "AppleUSBDeviceNCM11Control",
+                "IORegistryEntryName": "AppleUSBDeviceNCM11Control"
+              }
+            ],
+            "IORegistryEntryName": "AppleUSBNCMControl"
+          },
+          {
+            "IOObjectClass": "IOUSBDeviceInterface",
+            "IORegistryEntryChildren": [
+              {
+                "IOObjectClass": "AppleUSBDeviceNCM11Data",
+                "IORegistryEntryChildren": [
+                  {
+                    "IOObjectClass": "IOEthernetInterface",
+                    "IORegistryEntryChildren": [
+                      {
+                        "IOObjectClass": "IONetworkStack",
+                        "IORegistryEntryChildren": [
+                          {
+                            "IOObjectClass": "IONetworkStackUserClient",
+                            "IORegistryEntryName": "IONetworkStackUserClient"
+                          }
+                        ],
+                        "IORegistryEntryName": "IONetworkStack"
+                      }
+                    ],
+                    "IORegistryEntryName": "en4"
+                  }
+                ],
+                "IORegistryEntryName": "AppleUSBDeviceNCM11Data"
+              }
+            ],
+            "IORegistryEntryName": "AppleUSBNCMData"
+          },
+          {
+            "IOObjectClass": "IOUSBDeviceInterface",
+            "IORegistryEntryChildren": [
+              {
+                "IOObjectClass": "AppleUSBDeviceNCM11Control",
+                "IORegistryEntryName": "AppleUSBDeviceNCM11Control"
+              }
+            ],
+            "IORegistryEntryName": "AppleUSBNCMControlAux"
+          },
+          {
+            "IOObjectClass": "IOUSBDeviceInterface",
+            "IORegistryEntryChildren": [
+              {
+                "IOObjectClass": "AppleUSBDeviceNCM11Data",
+                "IORegistryEntryChildren": [
+                  {
+                    "IOObjectClass": "AppleUSBDeviceNCMPrivateEthernetInterface",
+                    "IORegistryEntryChildren": [
+                      {
+                        "IOObjectClass": "IONetworkStack",
+                        "IORegistryEntryChildren": [
+                          {
+                            "IOObjectClass": "IONetworkStackUserClient",
+                            "IORegistryEntryName": "IONetworkStackUserClient"
+                          }
+                        ],
+                        "IORegistryEntryName": "IONetworkStack"
+                      }
+                    ],
+                    "IORegistryEntryName": "anpi1"
+                  }
+                ],
+                "IORegistryEntryName": "AppleUSBDeviceNCM11Data"
+              }
+            ],
+            "IORegistryEntryName": "AppleUSBNCMDataAux"
+          }
+        ],
+        "IORegistryEntryName": "AppleT8112USBXDCI"
+      }
+    ],
+    "IORegistryEntryName": "usb-drd1"
+  }
+]

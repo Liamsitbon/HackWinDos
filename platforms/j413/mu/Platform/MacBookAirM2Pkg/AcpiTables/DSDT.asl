@@ -347,5 +347,79 @@
                 }
             }
         }
+
+        //
+        // Apple DockChannel Input Transport (Keyboard & Trackpad for MacBook Air M2).
+        // Matches ACPI\APPL0008 hardware ID for AppleDockChannel.sys driver.
+        //
+        Device (MTP0)
+        {
+            Name (_HID, "APPL0008")
+            Name (_UID, Zero)
+            Name (_STA, 0x0F)
+            Name (_CRS, ResourceTemplate ()
+            {
+                // DockChannel registers on T8112 (from live ADT: 0x24eb00000, 0x24eb14000)
+                QWordMemory (ResourceConsumer, PosDecode, MinFixed, MaxFixed,
+                    NonCacheable, ReadWrite, 0x0,
+                    0x000000024EB00000, 0x000000024EB00FFF, 0x0,
+                    0x0000000000001000, ,, , AddressRangeMemory, TypeStatic)
+                QWordMemory (ResourceConsumer, PosDecode, MinFixed, MaxFixed,
+                    NonCacheable, ReadWrite, 0x0,
+                    0x000000024EB14000, 0x000000024EB14FFF, 0x0,
+                    0x0000000000001000, ,, , AddressRangeMemory, TypeStatic)
+                // AIC IRQ 850
+                Interrupt (ResourceConsumer, Level, ActiveHigh, Exclusive) { 850 }
+            })
+        }
+
+        //
+        // Apple AGX GPU for M2 (G14G, T8112).
+        // Matches ACPI\APPL0002 hardware ID for AppleAgx.sys WDDM driver.
+        //
+        Device (AGX0)
+        {
+            Name (_HID, "APPL0002")
+            Name (_UID, Zero)
+            Name (_CCA, One)
+            Name (_STA, 0x0F)
+            Name (_CRS, ResourceTemplate ()
+            {
+                // SGX MMIO region on T8112 (from live ADT: 0x204000000, 64 MB)
+                QWordMemory (ResourceConsumer, PosDecode, MinFixed, MaxFixed,
+                    NonCacheable, ReadWrite, 0x0,
+                    0x0000000204000000, 0x0000000207FFFFFF, 0x0,
+                    0x0000000004000000, ,, , AddressRangeMemory, TypeStatic)
+                // GFX-ASC MMIO region on T8112 (from live ADT: 0x206400000, 0x6c000)
+                QWordMemory (ResourceConsumer, PosDecode, MinFixed, MaxFixed,
+                    NonCacheable, ReadWrite, 0x0,
+                    0x0000000206400000, 0x000000020646BFFF, 0x0,
+                    0x000000000006C000, ,, , AddressRangeMemory, TypeStatic)
+                // Synthetic Power Broker
+                QWordMemory (ResourceConsumer, PosDecode, MinFixed, MaxFixed,
+                    NonCacheable, ReadWrite, 0x0,
+                    0x0000000300000000, 0x0000000300000FFF, 0x0,
+                    0x0000000000001000, ,, , AddressRangeMemory, TypeStatic)
+                Interrupt (ResourceConsumer, Level, ActiveHigh, Exclusive) { 880 }
+                Interrupt (ResourceConsumer, Level, ActiveHigh, Exclusive) { 881 }
+                Interrupt (ResourceConsumer, Level, ActiveHigh, Exclusive) { 882 }
+                Interrupt (ResourceConsumer, Level, ActiveHigh, Exclusive) { 883 }
+                Interrupt (ResourceConsumer, Level, ActiveHigh, Exclusive) { 884 }
+                Interrupt (ResourceConsumer, Level, ActiveHigh, Exclusive) { 885 }
+                Interrupt (ResourceConsumer, Level, ActiveHigh, Exclusive) { 886 }
+                Interrupt (ResourceConsumer, Level, ActiveHigh, Exclusive) { 887 }
+                Interrupt (ResourceConsumer, Level, ActiveHigh, Exclusive) { 888 }
+            })
+            Name (_DSD, Package ()
+            {
+                ToUUID ("daffd814-6eba-4d8c-8a91-bc9bbf4aa301"),
+                Package ()
+                {
+                    Package () { "agx-contract-version", 0x03 },
+                    Package () { "agx-firmware-generation", "G14" },
+                    Package () { "agx-firmware-version", "V14_0" }
+                }
+            })
+        }
     }
- }
+}
