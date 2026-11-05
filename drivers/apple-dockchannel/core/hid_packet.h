@@ -4,8 +4,7 @@
  */
 #ifndef APPLE_DOCKCHANNEL_HID_PACKET_H
 #define APPLE_DOCKCHANNEL_HID_PACKET_H
-#include <stddef.h>
-#include <stdint.h>
+#include "dc_types.h"
 
 #define DCHID_MAX_PAYLOAD 65524u
 #define DCHID_COMMAND_CHANNEL 0x11u

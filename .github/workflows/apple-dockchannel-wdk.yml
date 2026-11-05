@@ -28,7 +28,7 @@ jobs:
           msbuild-architecture: x64
       - uses: NuGet/setup-nuget@v2
       - name: Restore official SDK and WDK
-        run: nuget restore packages.config -PackagesDirectory packages
+        run: nuget restore drivers/apple-dockchannel/windows/packages.config -PackagesDirectory packages
       - name: Expose WDK host tools
         shell: pwsh
         run: |

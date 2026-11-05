@@ -2,8 +2,7 @@
 #ifndef APPLE_DOCKCHANNEL_CORE_H
 #define APPLE_DOCKCHANNEL_CORE_H
 
-#include <stddef.h>
-#include <stdint.h>
+#include "dc_types.h"
 
 /* Callbacks address offsets in the already mapped data bank. The adapter owns
  * register ordering, power, cancellation and serialization. No polling here. */

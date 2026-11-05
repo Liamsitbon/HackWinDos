@@ -166,7 +166,6 @@ BOOLEAN DcEvtInterruptIsr(
     _In_ WDFINTERRUPT Interrupt,
     _In_ ULONG MessageID)
 {
-    PDC_DEVICE_CONTEXT context = DcGetDeviceContext(WdfInterruptGetDevice(Interrupt));
     UNREFERENCED_PARAMETER(MessageID);
 
     WdfInterruptQueueDpcForIsr(Interrupt);

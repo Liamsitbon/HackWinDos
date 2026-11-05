@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\dockchannel_windows.h" />
+    <ClInclude Include="..\core\dc_types.h" />
     <ClInclude Include="..\core\dockchannel.h" />
     <ClInclude Include="..\core\hid_packet.h" />
     <ClInclude Include="..\core\hid_stream.h" />
