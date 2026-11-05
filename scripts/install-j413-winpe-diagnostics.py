@@ -110,6 +110,29 @@ def collect(mount, directory):
         print(log.read_bytes().split(b'\0', 1)[0].decode('ascii', 'replace'))
 
 
+def collect_without_mount(disk, info, directory):
+    from tools.fat32_readonly import Fat32Reader
+    # The exact internal FAT ESP is independently re-resolved immediately before
+    # opening the block device. No raw-device writer or repair routine is used.
+    if base.find_esp() != disk or info.get('MountPoint'):
+        raise ValueError('Raw collection target changed or is mounted')
+    size, block = info.get('TotalSize'), info.get('DeviceBlockSize')
+    if not isinstance(size,int) or not isinstance(block,int):
+        raise ValueError('Measured partition size/block size unavailable')
+    device = Path('/dev')/disk
+    with device.open('rb', buffering=0) as stream:
+        reader = Fat32Reader(stream,size,block)
+        (directory/'FAT32.json').write_bytes(json_bytes(reader.geometry()))
+        bootstrap = reader.read_file('m1n1/boot.bin',8*1024*1024)
+        observed = base.digest(bootstrap)
+        if observed != profile.BOOTSTRAP_SHA256:
+            raise ValueError('Raw bootstrap differs from Setup-reaching firmware: '+observed)
+        raw = reader.read_file('m1n1/j413uefi.log',65536)
+    (directory/'j413uefi.log').write_bytes(raw)
+    print('Read-only FAT32 extraction; bootstrap SHA256: '+observed)
+    print(raw.split(b'\0',1)[0].decode('ascii','replace'))
+
+
 def operate(disk, diagnostic, restore=None, collect_only=False):
     stamp = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')
     exp = 'EXP-'+stamp+'-J413-WINPE-'+uuid.uuid4().hex[:8]
@@ -135,6 +158,13 @@ def operate(disk, diagnostic, restore=None, collect_only=False):
             raise ValueError('ESP changed after mount')
         mountpoint = info.get('MountPoint')
         if not mountpoint:
+            if collect_only:
+                collect_without_mount(disk,info,directory)
+                base.record('\nAfter '+datetime.now(timezone.utc).isoformat()+', '+exp+
+                            ': existing UEFI log collected through bounded read-only FAT32 extraction; '
+                            'no mount, repair, media replacement or guest launch. Evidence '+str(directory)+'.\n')
+                print('Evidence: '+str(directory))
+                return
             raise ValueError('ESP did not mount. No repair or media replacement attempted; see '+str(directory/'mount.txt'))
         mount = Path(mountpoint)
         mounted_read_only = collect_only and not was_mounted

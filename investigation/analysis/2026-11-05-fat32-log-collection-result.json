@@ -1,0 +1,17 @@
+{
+  "DiskUUID": "6E5BC1A2-9871-4E5A-8E60-BF68C8E785BB",
+  "TotalSize": 9500098560,
+  "DeviceBlockSize": 4096,
+  "MountPoint": "",
+  "Internal": true,
+  "Content": "EFI",
+  "FilesystemType": "msdos",
+  "recorded_utc": "2026-11-05T21:59:26.868397+00:00",
+  "source_files": [
+    "mu/Common/TIANO/FatPkg/EnhancedFatDxe/FatFileSystem.h",
+    "tools/fat32_readonly.py"
+  ],
+  "verification": "Six sparse-image FAT32 regressions and five diagnostic transaction/policy tests pass; no broad suite or firmware build.",
+  "live_raw_read_performed": false,
+  "privilege_boundary": "sudo -n requires an owner password; existing root evidence and partition bytes were not read by the agent."
+}

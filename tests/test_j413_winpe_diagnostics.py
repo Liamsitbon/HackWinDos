@@ -79,3 +79,12 @@ class WinpeDiagnosticTests(unittest.TestCase):
         self.assertEqual((self.mount/'sources/boot.wim').read_bytes(),self.old)
         self.assertEqual(self.mount_command.call_args.args[0],['diskutil','mount','readOnly','disk9s4'])
         self.assertFalse(list(install.BACKUPS.glob('*/RECOVERY.json')))
+
+    def test_failed_mount_uses_read_only_fallback_only_for_collection(self):
+        with patch.object(install.base,'disk_info',return_value={'DiskUUID':install.profile.ESP_UUID,'MountPoint':''}), \
+             patch.object(install,'collect_without_mount') as raw, contextlib.redirect_stdout(io.StringIO()):
+            install.operate('disk9s4',{},collect_only=True)
+            self.assertEqual(raw.call_count,1)
+            with self.assertRaisesRegex(ValueError,'did not mount'):self.perform()
+            self.assertEqual(raw.call_count,1)
+        self.assertEqual((self.mount/'sources/boot.wim').read_bytes(),self.old)
