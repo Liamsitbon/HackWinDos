@@ -1,0 +1,21 @@
+{
+  "format_version": 1,
+  "publication_method": "Reviewed source snapshots appended to existing main; exact Git tree identity is preserved. Local implementation history is retained in a private Git bundle before aligning the local branch.",
+  "snapshots": [
+    {
+      "local_commit": "eee06491456d686803bdadacb0ddf24f10ef7f25",
+      "public_commit": "634a6579323e8041cfb1ba6201cd59c6a1a8346f",
+      "tree": "fa6b455a21de1d3333a9320576e157d1b9a1b902"
+    },
+    {
+      "local_commit": "383075870b43ae244e9edd0de61b70d47d21c234",
+      "public_commit": "178670b624e05a5e1d8b2f7e332b47537fa1f93e",
+      "tree": "61a38f0deeb124926fd9c76383f1237ed8724e1a"
+    },
+    {
+      "local_commit": "455c5a163f49bb9c9e7c4f6812337cfeccbaacba",
+      "public_commit": "b12c555dd401d9d649ad464019f9e7f65cb6fb14",
+      "tree": "973bba6b7227858b4ab8a702f74ddf962f2dd9ef"
+    }
+  ]
+}
