@@ -1,0 +1,37 @@
+{
+  "experiment": "EXP-20261106-J413-062",
+  "focused_test_count": 22,
+  "focused_test_log": ".local/winpe-diagnostics/driver-focused-20261106.log",
+  "current_wim_verified": true,
+  "current_wim_sha256": "3a85e0a54facf56fa08750b173dd3191da06bc54a396233b1b26aeff642e8500",
+  "prepared_bundle": ".local/driver-injection-bundles/job.jVvCRN/bundle",
+  "eligible_packages": [],
+  "driver_injected": false,
+  "wim_modified": false,
+  "dism_native_execution": false,
+  "powershell_servicing_function_tested_with_mocked_dism": true,
+  "originals_preserved": true,
+  "local_plan": {
+    "platform": "j413",
+    "architecture": "ARM64",
+    "selected": [],
+    "blocked": [
+      {
+        "name": "AppleDockChannel",
+        "reason": "MTP firmware, DART, IRQ and HID report adapter need qualification"
+      },
+      {
+        "name": "AppleAgx",
+        "reason": "No complete INF/SYS/CAT package"
+      }
+    ],
+    "qualification": "Plan only: catalog trust, DISM and hardware execution are not verified."
+  },
+  "scripts": {
+    "scripts/inject-j413-drivers.ps1": "a76fc696a32a3f62dddbaff88efdc0e5cef2766ff69d5895f2cc94ba96bfa5a2",
+    "scripts/prepare-j413-driver-injection.command": "2624a8ab6d67156250e1d42e59e2ffbc1dc6e426c0bf5f1e018da4901e0e6889"
+  },
+  "prepared_bundle_after_wdk": ".local/driver-injection-bundles/job.RI4N4F/bundle",
+  "new_wdk_result": "investigation/analysis/2026-11-06-dockchannel-wdk-result.json",
+  "qualification": "Preparation and mocked servicing verified; new SYS built with WDK. No eligible runtime package and no actual DISM or hardware driver run."
+}

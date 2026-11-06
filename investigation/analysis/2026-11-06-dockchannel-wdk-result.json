@@ -1,0 +1,39 @@
+{
+  "recorded_utc": "2026-11-06T07:52:53.265665+00:00",
+  "experiment": "EXP-20261106-J413-063",
+  "workflow_run": 42183372626,
+  "workflow_job": 127777888880,
+  "workflow_url": "https://github.com/Liamsitbon/HackWinDos/actions/runs/42183372626",
+  "source_commit": "9104a54a3f1975675e185878da1537c470227611",
+  "source_tree": "9eff5bf372b0f56d3ae1b686c45c365f866122d9",
+  "artifact_id": 13486965214,
+  "archive_sha256": "7b59c0215ea92745c7bb5ca9201091566927bdd3d111418b259654443918be26",
+  "result": "success",
+  "architecture": "ARM64",
+  "configuration": "Debug",
+  "linked_sys": true,
+  "runtime_qualified": false,
+  "catalog_trust_verified": false,
+  "automatic_injection_eligible": false,
+  "staged_package": "dist/j413-driver-build-exp063/AppleDockChannel",
+  "previous_package_recovery": ".local/driver-builds/pre-exp063-driver-build",
+  "files": {
+    "AppleDockChannel.sys": {
+      "sha256": "27f9d6be20d407a3a1d5e87f6c7c8d60f5cea763476b1cd7b8182ad83f77ccea",
+      "size": 35848
+    },
+    "AppleDockChannel.inf": {
+      "sha256": "f4c649f50e5920f86e26896a4d591304c507e294aef9e15a6db88514ac8f1569",
+      "size": 1494
+    },
+    "AppleDockChannel.cat": {
+      "sha256": "90de8cb89e1c7fea6f83889f697bd3709c626bb464ddf2da012203011b9e79a3",
+      "size": 2666
+    }
+  },
+  "compiler_warnings": 0,
+  "compiler_errors": 0,
+  "wdk": "10.0.28000.2526",
+  "log_record": ".local/driver-builds/EXP-20261106-J413-063/CI-LOG.json",
+  "log_content_sha256": "37560d7f67b4b7586b12be5605411cb4fc055a055cfa2ff1e2e23213316fdb92"
+}
