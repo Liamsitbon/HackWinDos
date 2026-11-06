@@ -1,0 +1,37 @@
+{
+  "recorded_utc": "2026-11-06T08:57:50.182276+00:00",
+  "experiment": "EXP-20261106-J413-066",
+  "boot": {
+    "role": "standalone-bootstrap",
+    "sha256": "d2c2f46520e2b33059b738370a344eedd5130536de499829af249230fe571123",
+    "size": 2541888
+  },
+  "firmware": {
+    "role": "guest-firmware",
+    "sha256": "e1bcbb9328907e18fa0630d164069f8e6c3d7066ae2860a02aeae1bd0283ce01",
+    "size": 30965760
+  },
+  "manifest": "dist/j413/boot-experiment/MANIFEST.json",
+  "profile": "debug/physical/off; both no-proxy stages",
+  "checkpoint_count": 29,
+  "actual_compiled_checkpoint_strings": 58,
+  "nvme_efi_sha256": "7302f157c2100c43c2f7146b85e50b7493e82d5bf8486ded7e86f56b168ea5b7",
+  "nvme_debug_library": "UefiDebugLibConOut",
+  "software_tests": 20,
+  "checks": [
+    "actual patch applies and strips back to exact original bytes",
+    "each checkpoint has entry and return",
+    "nested BaseCore staging is idempotent and rejects unrelated edits",
+    "firmware source provenance",
+    "existing storage scope regression",
+    "direct installer transaction tests",
+    "full Mu and two-stage build",
+    "actual NVMe binary contains all 58 checkpoint messages",
+    "nested image/profile/manifest verification",
+    "dry-run exact internal ESP"
+  ],
+  "recovery": ".local/recovery-20261106-before-nvme-inner",
+  "installed": false,
+  "native_qualified": false,
+  "qualification": "Further localization only; no physical storage/USB fix or native boot result."
+}

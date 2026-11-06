@@ -1,0 +1,480 @@
+--- a/MU_BASECORE/MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpress.c
++++ b/MU_BASECORE/MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpress.c
+@@ -1132,6 +1132,9 @@
+   Passthru         = NULL;
+   ParentDevicePath = NULL;
+ 
++#ifdef J413_BOOT_CONTRACT
++  DEBUG ((DEBUG_INFO, "J413 NVMe op: Start 01 gBS->OpenProtocol entered\n"));
++#endif
+   Status = gBS->OpenProtocol (
+                   Controller,
+                   &gEfiDevicePathProtocolGuid,
+@@ -1140,10 +1143,16 @@
+                   Controller,
+                   EFI_OPEN_PROTOCOL_BY_DRIVER
+                   );
++#ifdef J413_BOOT_CONTRACT
++  DEBUG ((DEBUG_INFO, "J413 NVMe op: Start 01 gBS->OpenProtocol returned %r\n", Status));
++#endif
+   if ((EFI_ERROR (Status)) && (Status != EFI_ALREADY_STARTED)) {
+     return Status;
+   }
+ 
++#ifdef J413_BOOT_CONTRACT
++  DEBUG ((DEBUG_INFO, "J413 NVMe op: Start 02 gBS->OpenProtocol entered\n"));
++#endif
+   Status = gBS->OpenProtocol (
+                   Controller,
+                   &gEfiPciIoProtocolGuid,
+@@ -1152,6 +1161,9 @@
+                   Controller,
+                   EFI_OPEN_PROTOCOL_BY_DRIVER
+                   );
++#ifdef J413_BOOT_CONTRACT
++  DEBUG ((DEBUG_INFO, "J413 NVMe op: Start 02 gBS->OpenProtocol returned %r\n", Status));
++#endif
+ 
+   if (EFI_ERROR (Status) && (Status != EFI_ALREADY_STARTED)) {
+     return Status;
+@@ -1161,7 +1173,13 @@
+   // Check EFI_ALREADY_STARTED to reuse the original NVME_CONTROLLER_PRIVATE_DATA.
+   //
+   if (Status != EFI_ALREADY_STARTED) {
++#ifdef J413_BOOT_CONTRACT
++    DEBUG ((DEBUG_INFO, "J413 NVMe op: Start private allocation entered\n"));
++#endif
+     Private = AllocateZeroPool (sizeof (NVME_CONTROLLER_PRIVATE_DATA));
++#ifdef J413_BOOT_CONTRACT
++    DEBUG ((DEBUG_INFO, "J413 NVMe op: Start private allocation returned %p\n", Private));
++#endif
+ 
+     if (Private == NULL) {
+       DEBUG ((DEBUG_ERROR, "NvmExpressDriverBindingStart: allocating pool for Nvme Private Data failed!\n"));
+@@ -1172,12 +1190,18 @@
+     //
+     // Save original PCI attributes
+     //
++#ifdef J413_BOOT_CONTRACT
++    DEBUG ((DEBUG_INFO, "J413 NVMe op: Start 03 PciIo->Attributes entered\n"));
++#endif
+     Status = PciIo->Attributes (
+                       PciIo,
+                       EfiPciIoAttributeOperationGet,
+                       0,
+                       &Private->PciAttributes
+                       );
++#ifdef J413_BOOT_CONTRACT
++    DEBUG ((DEBUG_INFO, "J413 NVMe op: Start 03 PciIo->Attributes returned %r\n", Status));
++#endif
+ 
+     if (EFI_ERROR (Status)) {
+       return Status;
+@@ -1186,12 +1210,18 @@
+     //
+     // Enable 64-bit DMA support in the PCI layer.
+     //
++#ifdef J413_BOOT_CONTRACT
++    DEBUG ((DEBUG_INFO, "J413 NVMe op: Start 04 PciIo->Attributes entered\n"));
++#endif
+     Status = PciIo->Attributes (
+                       PciIo,
+                       EfiPciIoAttributeOperationEnable,
+                       EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE,
+                       NULL
+                       );
++#ifdef J413_BOOT_CONTRACT
++    DEBUG ((DEBUG_INFO, "J413 NVMe op: Start 04 PciIo->Attributes returned %r\n", Status));
++#endif
+     if (EFI_ERROR (Status)) {
+       DEBUG ((DEBUG_WARN, "NvmExpressDriverBindingStart: failed to enable 64-bit DMA (%r)\n", Status));
+     }
+@@ -1252,7 +1282,13 @@
+     InitializeListHead (&Private->AsyncPassThruQueue);
+     InitializeListHead (&Private->UnsubmittedSubtasks);
+ 
++#ifdef J413_BOOT_CONTRACT
++    DEBUG ((DEBUG_INFO, "J413 NVMe op: Start 05 NvmeControllerInit entered\n"));
++#endif
+     Status = NvmeControllerInit (Private);
++#ifdef J413_BOOT_CONTRACT
++    DEBUG ((DEBUG_INFO, "J413 NVMe op: Start 05 NvmeControllerInit returned %r\n", Status));
++#endif
+     if (EFI_ERROR (Status)) {
+       goto Exit;
+     }
+@@ -1265,6 +1301,9 @@
+     // which is only installed when the number of IO queues is greater than 1
+     //
+     if (NVME_SUPPORT_BLOCKIO2 (Private)) {
++#ifdef J413_BOOT_CONTRACT
++      DEBUG ((DEBUG_INFO, "J413 NVMe op: Start 06 gBS->CreateEvent entered\n"));
++#endif
+       Status = gBS->CreateEvent (
+                       EVT_TIMER | EVT_NOTIFY_SIGNAL,
+                       TPL_NOTIFY,
+@@ -1272,15 +1311,24 @@
+                       Private,
+                       &Private->TimerEvent
+                       );
++#ifdef J413_BOOT_CONTRACT
++      DEBUG ((DEBUG_INFO, "J413 NVMe op: Start 06 gBS->CreateEvent returned %r\n", Status));
++#endif
+       if (EFI_ERROR (Status)) {
+         goto Exit;
+       }
+ 
++#ifdef J413_BOOT_CONTRACT
++      DEBUG ((DEBUG_INFO, "J413 NVMe op: Start 07 gBS->SetTimer entered\n"));
++#endif
+       Status = gBS->SetTimer (
+                       Private->TimerEvent,
+                       TimerPeriodic,
+                       NVME_HC_ASYNC_TIMER
+                       );
++#ifdef J413_BOOT_CONTRACT
++      DEBUG ((DEBUG_INFO, "J413 NVMe op: Start 07 gBS->SetTimer returned %r\n", Status));
++#endif
+       if (EFI_ERROR (Status)) {
+         goto Exit;
+       }
+@@ -1288,18 +1336,27 @@
+ 
+     // MU_CHANGE [END] - Request Number of Queues from Controller
+ 
++#ifdef J413_BOOT_CONTRACT
++    DEBUG ((DEBUG_INFO, "J413 NVMe op: Start 08 gBS->InstallMultipleProtocolInterfaces entered\n"));
++#endif
+     Status = gBS->InstallMultipleProtocolInterfaces (
+                     &Controller,
+                     &gEfiNvmExpressPassThruProtocolGuid,
+                     &Private->Passthru,
+                     NULL
+                     );
++#ifdef J413_BOOT_CONTRACT
++    DEBUG ((DEBUG_INFO, "J413 NVMe op: Start 08 gBS->InstallMultipleProtocolInterfaces returned %r\n", Status));
++#endif
+     if (EFI_ERROR (Status)) {
+       goto Exit;
+     }
+ 
+     NvmeRegisterShutdownNotification ();
+   } else {
++#ifdef J413_BOOT_CONTRACT
++    DEBUG ((DEBUG_INFO, "J413 NVMe op: Start 09 gBS->OpenProtocol entered\n"));
++#endif
+     Status = gBS->OpenProtocol (
+                     Controller,
+                     &gEfiNvmExpressPassThruProtocolGuid,
+@@ -1308,6 +1365,9 @@
+                     Controller,
+                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                     );
++#ifdef J413_BOOT_CONTRACT
++    DEBUG ((DEBUG_INFO, "J413 NVMe op: Start 09 gBS->OpenProtocol returned %r\n", Status));
++#endif
+     if (EFI_ERROR (Status)) {
+       goto Exit;
+     }
+@@ -1319,24 +1379,42 @@
+     //
+     // Enumerate all NVME namespaces in the controller
+     //
++#ifdef J413_BOOT_CONTRACT
++    DEBUG ((DEBUG_INFO, "J413 NVMe op: Start 10 DiscoverAllNamespaces entered\n"));
++#endif
+     Status = DiscoverAllNamespaces (
+                Private
+                );
++#ifdef J413_BOOT_CONTRACT
++    DEBUG ((DEBUG_INFO, "J413 NVMe op: Start 10 DiscoverAllNamespaces returned %r\n", Status));
++#endif
+   } else if (!IsDevicePathEnd (RemainingDevicePath)) {
+     //
+     // Enumerate the specified NVME namespace
+     //
++#ifdef J413_BOOT_CONTRACT
++    DEBUG ((DEBUG_INFO, "J413 NVMe op: Start 11 Private->Passthru.GetNamespace entered\n"));
++#endif
+     Status = Private->Passthru.GetNamespace (
+                                  &Private->Passthru,
+                                  RemainingDevicePath,
+                                  &NamespaceId
+                                  );
++#ifdef J413_BOOT_CONTRACT
++    DEBUG ((DEBUG_INFO, "J413 NVMe op: Start 11 Private->Passthru.GetNamespace returned %r\n", Status));
++#endif
+ 
+     if (!EFI_ERROR (Status)) {
++#ifdef J413_BOOT_CONTRACT
++      DEBUG ((DEBUG_INFO, "J413 NVMe op: Start 12 EnumerateNvmeDevNamespace entered\n"));
++#endif
+       Status = EnumerateNvmeDevNamespace (
+                  Private,
+                  NamespaceId
+                  );
++#ifdef J413_BOOT_CONTRACT
++      DEBUG ((DEBUG_INFO, "J413 NVMe op: Start 12 EnumerateNvmeDevNamespace returned %r\n", Status));
++#endif
+     }
+   }
+ 
+@@ -1353,7 +1431,13 @@
+   //   PciIo->FreeBuffer (PciIo, 6, Private->Buffer);
+   // }
+ 
++#ifdef J413_BOOT_CONTRACT
++  DEBUG ((DEBUG_INFO, "J413 NVMe op: Start 13 NvmExpressDriverCleanUpQueues entered\n"));
++#endif
+   Status = NvmExpressDriverCleanUpQueues (Private);
++#ifdef J413_BOOT_CONTRACT
++  DEBUG ((DEBUG_INFO, "J413 NVMe op: Start 13 NvmExpressDriverCleanUpQueues returned %r\n", Status));
++#endif
+   if (EFI_ERROR (Status)) {
+     DEBUG ((DEBUG_ERROR, "%a: NvmExpressDriverCleanUpQueues failed %r\n", __func__, Status));
+   }
+--- a/MU_BASECORE/MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressHci.c
++++ b/MU_BASECORE/MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressHci.c
+@@ -1064,6 +1064,9 @@
+   //
+   // Verify the controller is still accessible
+   //
++#ifdef J413_BOOT_CONTRACT
++  DEBUG ((DEBUG_INFO, "J413 NVMe op: Init 01 PciIo->Pci.Read entered\n"));
++#endif
+   Status = PciIo->Pci.Read (
+                         PciIo,
+                         EfiPciIoWidthUint16,
+@@ -1071,6 +1074,9 @@
+                         ARRAY_SIZE (VidDid),
+                         VidDid
+                         );
++#ifdef J413_BOOT_CONTRACT
++  DEBUG ((DEBUG_INFO, "J413 NVMe op: Init 01 PciIo->Pci.Read returned %r\n", Status));
++#endif
+   if (EFI_ERROR (Status)) {
+     ASSERT_EFI_ERROR (Status);
+     return EFI_DEVICE_ERROR;
+@@ -1085,21 +1091,33 @@
+   //
+   // Enable this controller.
+   //
++#ifdef J413_BOOT_CONTRACT
++  DEBUG ((DEBUG_INFO, "J413 NVMe op: Init 02 PciIo->Attributes entered\n"));
++#endif
+   Status = PciIo->Attributes (
+                     PciIo,
+                     EfiPciIoAttributeOperationSupported,
+                     0,
+                     &Supports
+                     );
++#ifdef J413_BOOT_CONTRACT
++  DEBUG ((DEBUG_INFO, "J413 NVMe op: Init 02 PciIo->Attributes returned %r\n", Status));
++#endif
+ 
+   if (!EFI_ERROR (Status)) {
+     Supports &= (UINT64)EFI_PCI_DEVICE_ENABLE;
++#ifdef J413_BOOT_CONTRACT
++    DEBUG ((DEBUG_INFO, "J413 NVMe op: Init 03 PciIo->Attributes entered\n"));
++#endif
+     Status    = PciIo->Attributes (
+                          PciIo,
+                          EfiPciIoAttributeOperationEnable,
+                          Supports,
+                          NULL
+                          );
++#ifdef J413_BOOT_CONTRACT
++    DEBUG ((DEBUG_INFO, "J413 NVMe op: Init 03 PciIo->Attributes returned %r\n", Status));
++#endif
+   }
+ 
+   if (EFI_ERROR (Status)) {
+@@ -1110,7 +1128,13 @@
+   //
+   // Read the Controller Capabilities register and verify that the NVM command set is supported
+   //
++#ifdef J413_BOOT_CONTRACT
++  DEBUG ((DEBUG_INFO, "J413 NVMe op: Init 04 ReadNvmeControllerCapabilities entered\n"));
++#endif
+   Status = ReadNvmeControllerCapabilities (Private, &Private->Cap);
++#ifdef J413_BOOT_CONTRACT
++  DEBUG ((DEBUG_INFO, "J413 NVMe op: Init 04 ReadNvmeControllerCapabilities returned %r\n", Status));
++#endif
+   if (EFI_ERROR (Status)) {
+     return Status;
+   }
+@@ -1193,6 +1217,9 @@
+   //
+   // Allocate 6 pages of memory, then map it for bus master read and write.
+   //
++#ifdef J413_BOOT_CONTRACT
++  DEBUG ((DEBUG_INFO, "J413 NVMe op: Init 05 PciIo->AllocateBuffer entered\n"));
++#endif
+   Status = PciIo->AllocateBuffer (
+                     PciIo,
+                     AllocateAnyPages,
+@@ -1201,11 +1228,17 @@
+                     (VOID **)&Private->Buffer,
+                     0
+                     );
++#ifdef J413_BOOT_CONTRACT
++  DEBUG ((DEBUG_INFO, "J413 NVMe op: Init 05 PciIo->AllocateBuffer returned %r\n", Status));
++#endif
+   if (EFI_ERROR (Status)) {
+     return Status;
+   }
+ 
+   Bytes  = EFI_PAGES_TO_SIZE (AdminQueuePairPageCount);
++#ifdef J413_BOOT_CONTRACT
++  DEBUG ((DEBUG_INFO, "J413 NVMe op: Init 06 PciIo->Map entered\n"));
++#endif
+   Status = PciIo->Map (
+                     PciIo,
+                     EfiPciIoOperationBusMasterCommonBuffer,
+@@ -1214,6 +1247,9 @@
+                     &MappedAddr,
+                     &Private->Mapping
+                     );
++#ifdef J413_BOOT_CONTRACT
++  DEBUG ((DEBUG_INFO, "J413 NVMe op: Init 06 PciIo->Map returned %r\n", Status));
++#endif
+   if (EFI_ERROR (Status) || (Bytes != EFI_PAGES_TO_SIZE (AdminQueuePairPageCount))) {
+     return EFI_DEVICE_ERROR;
+   }
+@@ -1223,7 +1259,13 @@
+   // Disable the controller to wait for CSTS.RDY to become 0
+   // NVMe Base Specification 2.0e, Section 3.5 Controller Initialization
+   // MU_CHANGE [END] - Allocate IO Queue Buffer
++#ifdef J413_BOOT_CONTRACT
++  DEBUG ((DEBUG_INFO, "J413 NVMe op: Init 07 NvmeDisableController entered\n"));
++#endif
+   Status = NvmeDisableController (Private);
++#ifdef J413_BOOT_CONTRACT
++  DEBUG ((DEBUG_INFO, "J413 NVMe op: Init 07 NvmeDisableController returned %r\n", Status));
++#endif
+ 
+   if (EFI_ERROR (Status)) {
+     return Status;
+@@ -1271,7 +1313,13 @@
+   //
+   // Program admin queue attributes.
+   //
++#ifdef J413_BOOT_CONTRACT
++  DEBUG ((DEBUG_INFO, "J413 NVMe op: Init 08 WriteNvmeAdminQueueAttributes entered\n"));
++#endif
+   Status = WriteNvmeAdminQueueAttributes (Private, &Aqa);
++#ifdef J413_BOOT_CONTRACT
++  DEBUG ((DEBUG_INFO, "J413 NVMe op: Init 08 WriteNvmeAdminQueueAttributes returned %r\n", Status));
++#endif
+ 
+   if (EFI_ERROR (Status)) {
+     return Status;
+@@ -1287,12 +1335,24 @@
+   //
+   // Status = WriteNvmeAdminCompletionQueueBaseAddress (Private, &Acq);
+ 
++#ifdef J413_BOOT_CONTRACT
++  DEBUG ((DEBUG_INFO, "J413 NVMe op: Init 09 NvmeControllerInitAdminQueues entered\n"));
++#endif
+   Status = NvmeControllerInitAdminQueues (Private);
+-  if (EFI_ERROR (Status)) {
+-    return Status;
+-  }
+-
++#ifdef J413_BOOT_CONTRACT
++  DEBUG ((DEBUG_INFO, "J413 NVMe op: Init 09 NvmeControllerInitAdminQueues returned %r\n", Status));
++#endif
++  if (EFI_ERROR (Status)) {
++    return Status;
++  }
++
++#ifdef J413_BOOT_CONTRACT
++  DEBUG ((DEBUG_INFO, "J413 NVMe op: Init 10 NvmeEnableController entered\n"));
++#endif
+   Status = NvmeEnableController (Private, Private->SqData[0].EntrySize, Private->CqData[0].EntrySize);
++#ifdef J413_BOOT_CONTRACT
++  DEBUG ((DEBUG_INFO, "J413 NVMe op: Init 10 NvmeEnableController returned %r\n", Status));
++#endif
+   if (EFI_ERROR (Status)) {
+     return Status;
+   }
+@@ -1313,7 +1373,13 @@
+   //
+   // Get current Identify Controller Data
+   //
++#ifdef J413_BOOT_CONTRACT
++  DEBUG ((DEBUG_INFO, "J413 NVMe op: Init 11 NvmeIdentifyController entered\n"));
++#endif
+   Status = NvmeIdentifyController (Private, Private->ControllerData);
++#ifdef J413_BOOT_CONTRACT
++  DEBUG ((DEBUG_INFO, "J413 NVMe op: Init 11 NvmeIdentifyController returned %r\n", Status));
++#endif
+ 
+   if (EFI_ERROR (Status)) {
+     FreePool (Private->ControllerData);
+@@ -1352,7 +1418,13 @@
+   // The number of queues allocated is returned and stored in the controller private data structure
+   // using the NumberOfIoQueuePairs field.
+   //
++#ifdef J413_BOOT_CONTRACT
++  DEBUG ((DEBUG_INFO, "J413 NVMe op: Init 12 NvmeSetFeaturesNumberOfQueues entered\n"));
++#endif
+   Status = NvmeSetFeaturesNumberOfQueues (Private, NVME_MAX_QUEUES - 1);
++#ifdef J413_BOOT_CONTRACT
++  DEBUG ((DEBUG_INFO, "J413 NVMe op: Init 12 NvmeSetFeaturesNumberOfQueues returned %r\n", Status));
++#endif
+ 
+   if (EFI_ERROR (Status)) {
+     return Status;
+@@ -1379,6 +1451,9 @@
+   // Using the first data queue size for the number of pages required for the data queues
+   IoQueuePairPageCount = NVME_SQ_SIZE_IN_PAGES (Private, 1) + NVME_CQ_SIZE_IN_PAGES (Private, 1);
+ 
++#ifdef J413_BOOT_CONTRACT
++  DEBUG ((DEBUG_INFO, "J413 NVMe op: Init 13 PciIo->AllocateBuffer entered\n"));
++#endif
+   Status = PciIo->AllocateBuffer (
+                     PciIo,
+                     AllocateAnyPages,
+@@ -1387,11 +1462,17 @@
+                     (VOID **)&Private->IoQueueBuffer,
+                     0
+                     );
++#ifdef J413_BOOT_CONTRACT
++  DEBUG ((DEBUG_INFO, "J413 NVMe op: Init 13 PciIo->AllocateBuffer returned %r\n", Status));
++#endif
+   if (EFI_ERROR (Status)) {
+     return Status;
+   }
+ 
+   Bytes  = EFI_PAGES_TO_SIZE (IoQueuePairPageCount * Private->NumberOfIoQueuePairs);
++#ifdef J413_BOOT_CONTRACT
++  DEBUG ((DEBUG_INFO, "J413 NVMe op: Init 14 PciIo->Map entered\n"));
++#endif
+   Status = PciIo->Map (
+                     PciIo,
+                     EfiPciIoOperationBusMasterCommonBuffer,
+@@ -1400,6 +1481,9 @@
+                     &MappedAddr,
+                     &Private->IoQueueMapping
+                     );
++#ifdef J413_BOOT_CONTRACT
++  DEBUG ((DEBUG_INFO, "J413 NVMe op: Init 14 PciIo->Map returned %r\n", Status));
++#endif
+ 
+   if (EFI_ERROR (Status) || (Bytes != EFI_PAGES_TO_SIZE (IoQueuePairPageCount * Private->NumberOfIoQueuePairs))) {
+     return EFI_DEVICE_ERROR;
+@@ -1407,7 +1491,13 @@
+ 
+   Private->IoQueueBufferPciAddr = (UINT8 *)(UINTN)MappedAddr;
+ 
++#ifdef J413_BOOT_CONTRACT
++  DEBUG ((DEBUG_INFO, "J413 NVMe op: Init 15 NvmeControllerInitIoQueues entered\n"));
++#endif
+   Status = NvmeControllerInitIoQueues (Private);
++#ifdef J413_BOOT_CONTRACT
++  DEBUG ((DEBUG_INFO, "J413 NVMe op: Init 15 NvmeControllerInitIoQueues returned %r\n", Status));
++#endif
+   // MU_CHANGE [END] - Allocate IO Queue Buffer
+ 
+   return Status;

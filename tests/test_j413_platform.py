@@ -64,11 +64,18 @@ class J413PlatformTests(unittest.TestCase):
                 'Silicon/Apple/AppleSiliconPkg/Include/Drivers/AppleDartIoMmuDxe.h',
                 'Silicon/Apple/AppleSiliconPkg/AppleSiliconPkg.dec',
                 'Silicon/Apple/AppleSiliconPkg/AppleSiliconPkg.dsc.inc',
+                'MU_BASECORE/MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpress.c',
+                'MU_BASECORE/MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressHci.c',
 
             ):
                 destination=mu/relative
                 destination.parent.mkdir(parents=True, exist_ok=True)
-                destination.write_bytes(subprocess.check_output(['git','-C',str(ROOT/'mu'),'show','HEAD:'+relative]))
+                source_root = ROOT/'mu'
+                source_relative = relative
+                if relative.startswith('MU_BASECORE/'):
+                    source_root /= 'MU_BASECORE'
+                    source_relative = relative.removeprefix('MU_BASECORE/')
+                destination.write_bytes(subprocess.check_output(['git','-C',str(source_root),'show','HEAD:'+source_relative]))
             subprocess.run(['git','-C',str(mu),'add','.'],check=True)
             subprocess.run(['git','-C',str(mu),'-c','user.name=Test','-c','user.email=test@example.invalid','commit','-qm','pinned sources'],check=True)
             revision = subprocess.check_output(["git", "-C", str(mu), "rev-parse", "HEAD"], text=True).strip()

@@ -4,4 +4,4 @@ set -euo pipefail
 PROJECT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 exec sudo /usr/bin/python3 "$PROJECT/scripts/install-j413-direct-setup.py" \
     --firmware-only --native-mount \
-    --image-sha256 ce99784c8fa96560f896c48bdf26237e735f7f38d3b2fc12e7e9b4048e3def26
+    --image-sha256 d2c2f46520e2b33059b738370a344eedd5130536de499829af249230fe571123

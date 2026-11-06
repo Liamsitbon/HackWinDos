@@ -195,3 +195,22 @@ should show NvmExpressDriverBindingStart and controller/Identify/queue messages
 or the actual assertion. Photograph the last screen with elapsed time. No agent
 reboot; no new native result is claimed. Original Setup-reaching bootstrap and
 matching FD/manifest are at .local/recovery-20261106-before-nvme-console.
+
+
+## EXP066: per-operation checkpoints (current launcher)
+
+IMG_6348 reached NvmExpressDriverBindingStart but remained stationary for roughly
+fifteen minutes. Console routing is now physically observed; no later operation
+was identified. The current launcher pins bootstrap
+`d2c2f46520e2b33059b738370a344eedd5130536de499829af249230fe571123` and installs additional guarded
+entry/return messages around 29 existing initialization operations. Look for
+`J413 NVMe op: Start` and `J413 NVMe op: Init`, with the last entered operation
+lacking a returned status. This is further localization, not a confirmed fix.
+The exact patch leaves all original statements unchanged when diagnostics are
+removed; all 58 messages are present in the actual compiled NVMe driver.
+The same `bash scripts/install-j413-nvme-console.command` installs firmware only
+with backup. EXP064 hashes above describe the preceding historical candidate.
+Windows WIM and install files remain untouched. Recovery ce99784c lives at
+.local/recovery-20261106-before-nvme-inner; earlier 639d558d recovery remains.
+Plan and current result: investigation/analysis/2026-11-06-nvme-inner-plan.md and
+2026-11-06-nvme-inner-build-result.json. No native run of EXP066 is claimed.

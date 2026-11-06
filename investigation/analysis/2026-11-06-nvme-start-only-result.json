@@ -1,0 +1,16 @@
+{
+  "recorded_utc": "2026-11-06T08:49:12.654804+00:00",
+  "experiment": "EXP-20261106-J413-064",
+  "install_transaction": "EXP-20261106T083052Z-J413-ESP-6b3cf8f2",
+  "expected_bootstrap_sha256": "ce99784c8fa96560f896c48bdf26237e735f7f38d3b2fc12e7e9b4048e3def26",
+  "photo": "IMG_6348.HEIC",
+  "photo_sha256": "acb7146d1705aef48494d3921198affdc472447175cc50542524ffd9eaf8567e",
+  "operator_elapsed": "approximately 15 minutes",
+  "last_visible_message": "NvmExpressDriverBindingStart: start",
+  "root_enumeration": "returned Success; one synthetic PCI function",
+  "inner_trace_observed": true,
+  "windows_entry_observed": false,
+  "post_run_bootstrap_read": false,
+  "exception_identity": "not established by background protocol/driver text",
+  "verdict": "Console diagnostic observed; binding still fails to progress; exact operation remains inconclusive."
+}
