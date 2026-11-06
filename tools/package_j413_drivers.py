@@ -59,6 +59,10 @@ def audit(packages_root):
             'missing_files': missing, 'problems': problems,
             'complete_binary_package': not missing and not problems,
             'runtime_qualified': False, 'limitation': limitation,
+            # Binary completeness is not a functioning platform/driver contract.
+            # Revisit only with the source contract and a recorded experiment.
+            'automatic_injection_eligible': False,
+            'automatic_injection_blocker': limitation,
             'sha256': {p.name: sha(p) for p in files if p.is_file()},
         }
     return {
@@ -93,6 +97,7 @@ def package(packages_root, output):
                     raise ValueError('Package changed during copy: '+name+'/'+file)
         (staging/'MANIFEST.json').write_text(json.dumps(report, indent=2)+'\n')
         shutil.copyfile(ROOT/'scripts/install-j413-drivers.ps1', staging/'install-drivers.ps1')
+        shutil.copyfile(ROOT/'scripts/inject-j413-drivers.ps1', staging/'inject-drivers.ps1')
         staging.rename(output)
     return report
 

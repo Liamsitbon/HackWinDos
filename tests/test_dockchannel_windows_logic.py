@@ -31,6 +31,75 @@ class DockChannelWindowsLogicTests(unittest.TestCase):
                 *(str(CORE/(name+'.c')) for name in libraries), '-o', str(path/'test')], check=True)
             subprocess.run([str(path/'test')], check=True, timeout=10)
 
+    def test_prepare_release_prepare_recreates_stream_and_unwinds_failures(self):
+        source = (DRIVER/'device.c').read_text()
+        prepare = function(source, 'DcEvtDevicePrepareHardware')
+        release = function(source, 'DcEvtDeviceReleaseHardware')
+        self.run_c(r'''
+#include <assert.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+#include "hid_stream.h"
+#define _In_
+#define UNREFERENCED_PARAMETER(p) ((void)(p))
+#define DC_STREAM_BUF_SIZE 65536
+#define DC_WIN_POOL_TAG 42
+#define POOL_FLAG_NON_PAGED 1
+#define STATUS_SUCCESS 0
+#define STATUS_DEVICE_CONFIGURATION_ERROR -1
+#define STATUS_INSUFFICIENT_RESOURCES -2
+#define CmResourceTypeMemory 3
+#define MmNonCached 0
+typedef int NTSTATUS;
+typedef unsigned long ULONG;
+typedef unsigned char *PUCHAR;
+typedef void *WDFDEVICE;
+typedef void *WDFCMRESLIST;
+typedef struct {
+ int Type; union {struct {uintptr_t Start;unsigned long Length;} Memory;} u;
+} DESC,*PCM_PARTIAL_RESOURCE_DESCRIPTOR;
+typedef struct {
+ PUCHAR BaseAddress,StreamBuffer;ULONG MemoryLength;
+ struct dchid_stream Stream;void *WorkItem;
+} CONTEXT,*PDC_DEVICE_CONTEXT;
+static int allocations,frees,maps,unmaps,flushes,fail_alloc,fail_map;
+static DESC resource={.Type=3,.u.Memory={0x1000,0x1000}};
+static void *DcGetDeviceContext(void *p){return p;}
+static ULONG WdfCmResourceListGetCount(void *p){(void)p;return 1;}
+static DESC *WdfCmResourceListGetDescriptor(void *p,ULONG i){(void)p;assert(i==0);return &resource;}
+static void *MmMapIoSpace(uintptr_t a,ULONG n,int c){assert(a==0x1000&&n==0x1000&&c==0);if(fail_map)return NULL;++maps;return malloc(n);}
+static void MmUnmapIoSpace(void *p,ULONG n){assert(p&&n==0x1000&&flushes);++unmaps;free(p);}
+static void *ExAllocatePool2(int pool,ULONG n,int tag){assert(pool==1&&tag==42&&n==65536);if(fail_alloc)return NULL;++allocations;return malloc(n);}
+static void ExFreePoolWithTag(void *p,int tag){assert(p&&tag==42&&flushes);++frees;free(p);}
+static void WdfWorkItemFlush(void *p){assert(p);++flushes;}
+static void DcVhfTeardown(CONTEXT *c){assert(c);}
+NTSTATUS
+''' + prepare + '\nNTSTATUS\n' + release + r'''
+int main(void){
+ CONTEXT c={0};c.WorkItem=&c;
+ for(int trial=0;trial<2;++trial){
+  assert(DcEvtDevicePrepareHardware(&c,NULL,NULL)==0);
+  assert(c.StreamBuffer&&c.Stream.buffer==c.StreamBuffer&&c.Stream.used==0);
+  c.Stream.used=12;
+  assert(DcEvtDeviceReleaseHardware(&c,NULL)==0);
+  assert(!c.StreamBuffer&&!c.BaseAddress&&c.MemoryLength==0);
+ }
+ fail_alloc=1;
+ assert(DcEvtDevicePrepareHardware(&c,NULL,NULL)==-2);
+ assert(DcEvtDeviceReleaseHardware(&c,NULL)==0);
+ fail_alloc=0;fail_map=1;
+ assert(DcEvtDevicePrepareHardware(&c,NULL,NULL)==-1);
+ assert(DcEvtDeviceReleaseHardware(&c,NULL)==0);
+ fail_map=0;
+ assert(DcEvtDevicePrepareHardware(&c,NULL,NULL)==0);
+ assert(c.StreamBuffer&&c.Stream.used==0);
+ DcEvtDeviceReleaseHardware(&c,NULL);
+ assert(allocations==frees&&maps==unmaps);
+ return 0;
+}
+''', ('hid_packet', 'hid_stream'))
+
     def test_each_vhf_create_or_start_failure_unwinds_and_propagates(self):
         bridge = re.sub(r'^#include[^\n]*$', '', (DRIVER/'vhf_bridge.c').read_text(), flags=re.M)
         self.run_c(r'''

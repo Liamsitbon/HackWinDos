@@ -75,12 +75,6 @@ NTSTATUS DcEvtDeviceAdd(
     if (!NT_SUCCESS(status))
         return status;
 
-    context->StreamBuffer = (PUCHAR)ExAllocatePool2(POOL_FLAG_NON_PAGED, DC_STREAM_BUF_SIZE, DC_WIN_POOL_TAG);
-    if (!context->StreamBuffer)
-        return STATUS_INSUFFICIENT_RESOURCES;
-
-    dchid_stream_reset(&context->Stream, context->StreamBuffer, DC_STREAM_BUF_SIZE);
-
     context->Io.context = context;
     context->Io.read32 = DcRead32;
     context->Io.write32 = DcWrite32;
@@ -114,6 +108,14 @@ NTSTATUS DcEvtDevicePrepareHardware(
     if (context->BaseAddress == NULL)
         return STATUS_DEVICE_CONFIGURATION_ERROR;
 
+    // Prepare/Release can repeat on the same WDFDEVICE after resource changes.
+    // Match the allocation to the callback that releases it, not DeviceAdd.
+    context->StreamBuffer = (PUCHAR)ExAllocatePool2(
+        POOL_FLAG_NON_PAGED, DC_STREAM_BUF_SIZE, DC_WIN_POOL_TAG);
+    if (context->StreamBuffer == NULL)
+        return STATUS_INSUFFICIENT_RESOURCES;
+    (void)dchid_stream_reset(&context->Stream, context->StreamBuffer, DC_STREAM_BUF_SIZE);
+
     return STATUS_SUCCESS;
 }
 
@@ -125,11 +127,13 @@ NTSTATUS DcEvtDeviceReleaseHardware(
 
     UNREFERENCED_PARAMETER(ResourcesTranslated);
 
+    WdfWorkItemFlush(context->WorkItem);
     DcVhfTeardown(context);
 
     if (context->BaseAddress != NULL) {
         MmUnmapIoSpace(context->BaseAddress, context->MemoryLength);
         context->BaseAddress = NULL;
+        context->MemoryLength = 0;
     }
 
     if (context->StreamBuffer != NULL) {
@@ -158,6 +162,9 @@ NTSTATUS DcEvtDeviceD0Exit(
     PDC_DEVICE_CONTEXT context = DcGetDeviceContext(Device);
     UNREFERENCED_PARAMETER(TargetState);
 
+    // Framework interrupts are disabled before D0Exit; drain deferred users
+    // before deleting the VHF handles they submit reports through.
+    WdfWorkItemFlush(context->WorkItem);
     DcVhfTeardown(context);
     return STATUS_SUCCESS;
 }

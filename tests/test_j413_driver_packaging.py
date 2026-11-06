@@ -96,3 +96,68 @@ class DriverPackagingTests(unittest.TestCase):
         result = subprocess.run(command, capture_output=True, text=True)
         self.assertNotEqual(result.returncode, 0)
         self.assertIn('Hash mismatch', result.stderr)
+
+    def injection_command(self, *arguments):
+        pwsh = shutil.which('pwsh')
+        if not pwsh: self.skipTest('PowerShell is unavailable')
+        return [pwsh, '-NoProfile', '-File', str(self.output/'inject-drivers.ps1'),
+                '-Bundle', str(self.output), '-BootWim', str(self.root/'boot.wim'), *arguments]
+
+    def test_automatic_injection_plan_blocks_incomplete_contract_without_wim_changes(self):
+        self.fixture(); drivers.package(self.inputs, self.output)
+        original = b'original boot image not a real WIM'; (self.root/'boot.wim').write_bytes(original)
+        result = subprocess.run(self.injection_command('-PlanOnly'), capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        plan = json.loads(result.stdout)
+        self.assertEqual(plan['selected'], [])
+        self.assertIn('AppleDockChannel', [x['name'] for x in plan['blocked']])
+        actual = subprocess.run(self.injection_command('-OutputDirectory', str(self.root/'serviced')),
+                                capture_output=True, text=True)
+        self.assertNotEqual(actual.returncode, 0)
+        self.assertIn('No eligible driver', actual.stderr)
+        self.assertEqual((self.root/'boot.wim').read_bytes(), original)
+        self.assertFalse((self.root/'serviced').exists())
+
+    def test_automatic_injection_plan_checks_complete_package_hashes(self):
+        self.fixture(); drivers.package(self.inputs, self.output)
+        (self.root/'boot.wim').write_bytes(b'original')
+        (self.output/'AppleDockChannel/AppleDockChannel.sys').write_bytes(b'tampered')
+        result = subprocess.run(self.injection_command('-PlanOnly'), capture_output=True, text=True)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('Hash mismatch', result.stderr)
+
+    def test_actual_servicing_function_commits_verified_indexes_and_discards_failed_add(self):
+        self.fixture(); drivers.package(self.inputs, self.output)
+        boot = self.root/'boot.wim'; boot.write_bytes(b'original')
+        script = self.output/'inject-drivers.ps1'
+        # Dot-source plan mode to exercise the actual servicing function on a
+        # non-Windows host. Only DISM is mocked; no Windows servicing is claimed.
+        harness = self.root/'transaction.ps1'
+        harness.write_text(r'''
+param($Script,$Bundle,$Boot)
+. $Script -Bundle $Bundle -BootWim $Boot -PlanOnly > $null
+$global:calls=@(); $global:failAdd=$false
+function Invoke-J413Dism {
+ param([string[]]$Arguments,[string]$Log)
+ $global:calls += ($Arguments -join '|')
+ if($Arguments -contains '/Get-WimInfo'){return 'Architecture : arm64'}
+ if($Arguments -contains '/Add-Driver' -and $global:failAdd){throw 'simulated add failure'}
+ if($Arguments -contains '/Get-Drivers'){return 'Original File Name : AppleDockChannel.inf'}
+ return ''
+}
+$packages=@([pscustomobject]@{name='AppleDockChannel';inf='AppleDockChannel.inf'})
+Invoke-J413ImageServicing $Boot @(1,2) $packages 'mount' 'log'
+if(@($global:calls | Where-Object {$_ -match '/Commit'}).Count -ne 2){throw 'Indexes not committed'}
+if(@($global:calls | Where-Object {$_ -match '/Discard'}).Count){throw 'Successful run discarded'}
+$global:calls=@();$global:failAdd=$true
+try {Invoke-J413ImageServicing $Boot @(2) $packages 'mount' 'log';throw 'Failure lost'}
+catch {if($_.Exception.Message -ne 'simulated add failure'){throw}}
+if(@($global:calls | Where-Object {$_ -match '/Discard'}).Count -ne 1){throw 'Failed mount not discarded'}
+if(@($global:calls | Where-Object {$_ -match '/Commit'}).Count){throw 'Partial image committed'}
+'Actual servicing function regression passed; DISM mocked.'
+''')
+        result = subprocess.run([shutil.which('pwsh'), '-NoProfile', '-File', str(harness),
+                                 str(script), str(self.output), str(boot)], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('regression passed', result.stdout)
+        self.assertEqual(boot.read_bytes(), b'original')

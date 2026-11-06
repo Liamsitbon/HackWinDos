@@ -1,0 +1,59 @@
+{
+  "recorded_utc": "2026-11-06T07:44:45.908385+00:00",
+  "source_review": "investigation/analysis/2026-11-06-driver-port-and-injection-plan.md",
+  "repositories_examined": 50,
+  "aurora_linux_commit": "0943983df73eb270720a7e6ba13b009ccfd14312",
+  "aurora_m1n1_commit": "cf57aebc36b2c51c546d97f09e9bf390ff3f7be7",
+  "aurora_mu_commit": "063c6b34da94801d1ee9085594e5ac71ae1793b9",
+  "windows_samples_commit": "34c8e967f0fc9bac4febbad50e1999d0d8f5923f",
+  "windows_samples_apple_paths": [],
+  "windows_samples_tree_truncated": false,
+  "inspected_linux_files": {
+    "drivers/soc/apple/dockchannel.c": {
+      "sha256": "ac39417f4df2d778f90b891a9b1e6274a3a68f54d1294f95cb8e49d6e375ec60",
+      "license": [
+        "// SPDX-License-Identifier: GPL-2.0-only OR MIT",
+        "/*",
+        " * Apple DockChannel FIFO driver",
+        " * Copyright The Asahi Linux Contributors",
+        " */"
+      ]
+    },
+    "drivers/hid/dockchannel-hid/dockchannel-hid.c": {
+      "sha256": "e28e635ad990445159fa93f1cc846cfbf4a978982ab7f5102ad796a833ef99f8",
+      "license": [
+        "/*",
+        " * SPDX-License-Identifier: GPL-2.0 OR MIT",
+        " *",
+        " * Apple DockChannel HID transport driver",
+        " *"
+      ]
+    },
+    "arch/arm64/boot/dts/apple/t8112.dtsi": {
+      "sha256": "01ac2b98bddc581c534d3a81669e78d8c6aa3ed99e22389bfe47836ee19dfa85",
+      "license": [
+        "// SPDX-License-Identifier: GPL-2.0+ OR MIT",
+        "/*",
+        " * Apple T8112 \"M2\" SoC",
+        " *",
+        " * Other names: H14G"
+      ]
+    }
+  },
+  "port_contract": {
+    "fifo_data": "Linux 0x24eb34000; current Windows ACPI does not expose it",
+    "fifo_capacity": "Linux 0x800; Windows header 0x1000",
+    "irq": "Linux demultiplexed DockChannel tx/rx; Windows ISR unconditionally claims interrupt without source acknowledgement",
+    "firmware": "Linux RTKit helper and DMA/ring/GPIO/input enable handshake; Windows missing runtime adapter",
+    "hid": "Linux discovered per-interface HID descriptors; Windows hardcoded descriptors and size-based routing",
+    "usb": "Windows inbox USBXHCI/UCX/USBHUB3/HIDUSB after valid handoff; no ready Aurora Apple-specific Windows package found",
+    "gpu": "Linux DRM/Mesa is not a Windows WDDM driver"
+  },
+  "confirmed_lifecycle_defect": {
+    "before": "Actual Prepare/Release callback regression fails because stream storage is not prepared",
+    "after": "Allocation/reset moved to PrepareHardware; worker drained before teardown/unmap/free; four actual-C Windows adapter tests pass with ASan/UBSan",
+    "wdk_build": "pending"
+  },
+  "automatic_injection": "Implemented Windows DISM workflow; none of the current custom packages have a complete qualified runtime contract",
+  "hardware_result": "No new WinPE/USB/driver run; EXP061 report installation confirmed separately."
+}
