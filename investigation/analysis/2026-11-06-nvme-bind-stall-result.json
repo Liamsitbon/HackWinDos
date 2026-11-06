@@ -1,0 +1,17 @@
+{
+  "recorded_utc": "2026-11-06T08:17:49.347691+00:00",
+  "related_experiment": "EXP-20261106-J413-061",
+  "photo": "IMG_6347.HEIC",
+  "photo_sha256": "93b966dddd30d3b5f07aca566554df918da8e7cd55b59cc444b0fb6668b7e592",
+  "operator_wait": "one to two minutes",
+  "power_transition": "not supplied",
+  "last_visible_stage": "UEFI NVMe: NVMe controller entered; PciRoot(0x0)/Pci(0x0,0x0)",
+  "root_enumeration_returned": "Success",
+  "synthetic_pci_functions": 1,
+  "windows_entry_observed": false,
+  "full_exception_or_register_trace": "not captured; cropped background hexadecimal/driver text cannot establish exception identity",
+  "expected_firmware_sha256": "639d558d3e1abe42024df8edc298f12e283cc87906920851858a76e66db59cc9",
+  "post_run_firmware_read": false,
+  "verdict": "rejected for native Setup entry in this attempt; individual stopped operation and cause inconclusive",
+  "qualification": "This precedes loader/WIM execution; no evidence of a Windows driver or report-viewer failure."
+}

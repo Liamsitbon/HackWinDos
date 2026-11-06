@@ -20,6 +20,7 @@
 #SPDX-License-Identifier: BSD 2-Clause
 
 [Defines]
+  DEFINE J413_NVME_CONSOLE_TRACE  = TRUE
   PLATFORM_NAME                  = MacBookAirM2
   PLATFORM_GUID                  = 20222b8a-b9d8-483f-8556-d6de49c3a03f
   PLATFORM_VERSION               = 1.0

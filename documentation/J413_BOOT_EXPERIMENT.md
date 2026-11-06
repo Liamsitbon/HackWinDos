@@ -165,3 +165,33 @@ performed. See [external setup evidence](J413_EXTERNAL_SETUP.md).
 EXP018 photographs Windows Boot Manager Recovery (0xc000000f) with the preceding candidate; exact installed hash was not supplied. The current candidate additionally changes J413 boot presentation only. See [boot UI and recovery limits](J413_BOOT_UI_AND_RECOVERY.md). It has not been physically launched.
 
 EXP019/020 current candidate is text-only: no Windows-like mark or bar. Pre-GOP firmware UART lines use the guest surface, then stop at explicit GOP takeover; invisible host framebuffer logging is disabled. Automatic J413 Setup selection requires all four payload paths and permits removable BlockIo. External FAT32/DMA and built-in input remain unqualified; see the current [UI and media notes](J413_BOOT_UI_AND_RECOVERY.md).
+
+
+## EXP064: NVMe binding console diagnostics
+
+IMG_6347 shows successful root enumeration and one synthetic PCI function, then
+no return after `NVMe controller entered` for the operator's one to two minutes.
+This is before Windows/WIM entry. The new diagnostic only routes the existing
+NVMe DXE debug messages to the physical console; it is not a confirmed NVMe fix.
+Source review: investigation/analysis/2026-11-06-nvme-console-plan.md.
+
+Run on macOS, enter the owner password directly in Terminal:
+
+```bash
+bash scripts/install-j413-nvme-console.command
+```
+
+Pinned bootstrap SHA256:
+`ce99784c8fa96560f896c48bdf26237e735f7f38d3b2fc12e7e9b4048e3def26`.
+The installer verifies manifest and exact internal ESP, preserves bootstrap and
+firmware/media companions, and updates firmware only. Windows WIM and install
+parts are verified and retained. Explicit native FAT mounting is permitted only
+for firmware-only/restore when Disk Arbitration fails; no filesystem repair.
+Private mounts must unmount successfully or the command fails. The exact
+recovery command is printed, including native fallback when selected.
+
+After successful installation, one owner cold launch through HackWinDos UEFI
+should show NvmExpressDriverBindingStart and controller/Identify/queue messages
+or the actual assertion. Photograph the last screen with elapsed time. No agent
+reboot; no new native result is claimed. Original Setup-reaching bootstrap and
+matching FD/manifest are at .local/recovery-20261106-before-nvme-console.

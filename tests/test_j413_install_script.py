@@ -5,6 +5,7 @@ import io
 import json
 from pathlib import Path
 import plistlib
+import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -188,6 +189,46 @@ class DirectSetupInstallScriptTests(UsbDiscoveryInstallScriptTests):
         self.real_same_volume_check = self.installer.verify_same_volume
         patched = patch.object(self.installer, 'verify_same_volume')
         patched.start(); self.addCleanup(patched.stop)
+
+    def test_explicit_native_mount_rechecks_device_and_uses_only_fat_mount(self):
+        with patch.object(self.installer, 'find_esp', return_value='disk9s7'), \
+             patch.object(self.installer, 'disk_info', return_value={'DiskUUID':self.installer.ESP_UUID}), \
+             patch.object(Path, 'is_mount', return_value=True), \
+             patch.object(self.installer, 'run', return_value=b'') as run:
+            self.assertEqual(self.installer.native_mount('disk9s7',self.root), self.root/'esp')
+            run.assert_called_once_with('/sbin/mount_msdos','-o','rw,nobrowse,noexec','/dev/disk9s7',str(self.root/'esp'))
+        with patch.object(self.installer, 'find_esp', return_value='disk9s8'):
+            with self.assertRaisesRegex(ValueError,'identity changed'):
+                self.installer.native_mount('disk9s7',self.root)
+
+    def test_failed_normal_mount_allows_explicit_fallback_and_unmounts(self):
+        def run(*args):
+            if args == ('diskutil','mount','disk9s7'):
+                raise subprocess.CalledProcessError(1,args,b'mount failure')
+            if args == ('diskutil','unmount','disk9s7'):
+                self.commands.append(args); return b'unmounted'
+            return self.fake_run(*args)
+        with patch.object(self.installer,'NATIVE_MOUNT',True), \
+             patch.object(self.installer,'run',side_effect=run), \
+             patch.object(self.installer,'disk_info',return_value={'DiskUUID':self.installer.ESP_UUID}), \
+             patch.object(self.installer,'native_mount',return_value=self.mount) as native:
+            self.perform()
+        native.assert_called_once()
+        self.assertEqual(self.target.read_bytes(),b'new payload')
+        self.assertIn(('diskutil','unmount','disk9s7'),self.commands)
+        self.assertTrue(self.recovery_record().is_file())
+
+    def test_native_unmount_failure_cannot_report_success(self):
+        def run(*args):
+            if args in [('diskutil','mount','disk9s7'),('diskutil','unmount','disk9s7')]:
+                raise subprocess.CalledProcessError(1,args,b'mount/unmount failure')
+            return self.fake_run(*args)
+        with patch.object(self.installer,'NATIVE_MOUNT',True), \
+             patch.object(self.installer,'run',side_effect=run), \
+             patch.object(self.installer,'disk_info',return_value={'DiskUUID':self.installer.ESP_UUID}), \
+             patch.object(self.installer,'native_mount',return_value=self.mount):
+            with self.assertRaises(subprocess.CalledProcessError): self.perform()
+        self.assertIn('unmount FAILED',self.ledger.read_text())
 
     def test_same_volume_manifest_must_bind_target_and_image(self):
         with patch('tools.check_j413_setup.inspect', return_value={'errors': []}):

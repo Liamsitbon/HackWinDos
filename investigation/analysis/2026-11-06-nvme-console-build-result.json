@@ -1,0 +1,30 @@
+{
+  "recorded_utc": "2026-11-06T08:24:36.270985+00:00",
+  "experiment": "EXP-20261106-J413-064",
+  "boot": {
+    "role": "standalone-bootstrap",
+    "sha256": "ce99784c8fa96560f896c48bdf26237e735f7f38d3b2fc12e7e9b4048e3def26",
+    "size": 2541684
+  },
+  "firmware": {
+    "role": "guest-firmware",
+    "sha256": "650ca1bef79e7fac628c153a299ae32060e6f3054b61c5c2ca825e309149529c",
+    "size": 30965760
+  },
+  "manifest": "dist/j413/boot-experiment/MANIFEST.json",
+  "profile": "debug/physical/off; both stages no-proxy",
+  "nvme_linked_console_library": "MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf",
+  "as_built_inf_sha256": "377bd0a5d68ca153badae9712eb721a435d58510a71060afcd2605a0fa4afa0e",
+  "recovery": ".local/recovery-20261106-before-nvme-console",
+  "software_checks": [
+    "full Mu and two-stage build",
+    "nested layout and manifest verification",
+    "actual NVMe as-built library resolution",
+    "3 staging/scope regressions",
+    "16 direct installer transaction cases including explicit exact-target native fallback and unmount failure",
+    "dry-run exact internal ESP identity"
+  ],
+  "native_qualified": false,
+  "installed": false,
+  "qualification": "Diagnostic console routing only; no storage/USB cause or fix demonstrated."
+}

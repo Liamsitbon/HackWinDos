@@ -1,0 +1,18 @@
+--- a/Silicon/Apple/AppleSiliconPkg/AppleSiliconPkg.dsc.inc
++++ b/Silicon/Apple/AppleSiliconPkg/AppleSiliconPkg.dsc.inc
+@@ -679,7 +679,15 @@
+   MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
+   MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
+   MdeModulePkg/Universal/Disk/UdfDxe/UdfDxe.inf
++!ifdef J413_NVME_CONSOLE_TRACE
++  # J413 binding diagnostics only; the standard controller implementation is unchanged.
++  MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf {
++    <LibraryClasses>
++      DebugLib|MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
++  }
++!else
+   MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
++!endif
+   MdeModulePkg/Universal/Disk/RamDiskDxe/RamDiskDxe.inf
+   AppleSiliconPkg/Drivers/BootRamdiskHelperDxe/BootRamdiskHelperDxe.inf
+ 

@@ -63,6 +63,7 @@ class J413PlatformTests(unittest.TestCase):
                 'Silicon/Apple/AppleSiliconPkg/Drivers/AppleDartIoMmuDxe/AppleDartIoMmuDxe.inf',
                 'Silicon/Apple/AppleSiliconPkg/Include/Drivers/AppleDartIoMmuDxe.h',
                 'Silicon/Apple/AppleSiliconPkg/AppleSiliconPkg.dec',
+                'Silicon/Apple/AppleSiliconPkg/AppleSiliconPkg.dsc.inc',
 
             ):
                 destination=mu/relative

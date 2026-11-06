@@ -24,6 +24,7 @@ LEDGER = ROOT / 'investigation/EXPERIMENTS.md'
 BACKUPS = ROOT / '.local/direct-setup-installs'
 SETUP_SOURCE = None
 FIRMWARE_ONLY = False
+NATIVE_MOUNT = False
 COMPANION_FILES = ('m1n1/J413_EFI.fd', 'J413Setup/FIRMWARE-MANIFEST.json', 'J413Setup/MEDIA.json')
 
 
@@ -220,6 +221,18 @@ def record(text):
         os.fsync(stream.fileno())
 
 
+def native_mount(disk, directory):
+    info = disk_info(disk)
+    if find_esp() != disk or info.get('DiskUUID', '').upper() != ESP_UUID or info.get('MountPoint'):
+        raise ValueError('Native mount target identity changed')
+    mount = directory/'esp'
+    mount.mkdir(mode=0o700)
+    run('/sbin/mount_msdos', '-o', 'rw,nobrowse,noexec', '/dev/'+disk, str(mount))
+    if not mount.is_mount():
+        raise ValueError('Native FAT mount was not confirmed')
+    return mount
+
+
 def install(data, disk, source, provenance, restoring=False):
     stamp = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')
     exp_id = 'EXP-' + stamp + '-J413-ESP-' + uuid.uuid4().hex[:8]
@@ -237,12 +250,20 @@ def install(data, disk, source, provenance, restoring=False):
     temporary = None
     companion_rollback = None
     bootstrap_replaced = False
+    mounted_native = False
     try:
-        run('diskutil', 'mount', disk)
+        try:
+            run('diskutil', 'mount', disk)
+        except subprocess.CalledProcessError:
+            if not NATIVE_MOUNT:
+                raise
         info = disk_info(disk)
         if info.get('DiskUUID', '').upper() != ESP_UUID:
             raise ValueError('Partition identity changed after mount')
         mount = info.get('MountPoint')
+        if not mount and NATIVE_MOUNT:
+            mount = str(native_mount(disk, directory))
+            mounted_native = True
         if not mount or not Path(mount).is_dir():
             raise ValueError('ESP mount point unavailable')
         target = Path(mount)/'m1n1/boot.bin'
@@ -309,6 +330,7 @@ def install(data, disk, source, provenance, restoring=False):
                'Next checkpoint: operator records fixed-volume NVMe/ARM64 loader entry and the actual resulting Windows phase.\n')
         print(f'Installed: {target}\nSHA256: {digest(data)}\nBackup: {backup}')
         print('Rollback: sudo python3 '+shlex.quote(str(Path(__file__).resolve()))+
+              (' --native-mount' if NATIVE_MOUNT else '')+
               ' --esp-uuid '+shlex.quote(ESP_UUID)+' --restore '+shlex.quote(str(metadata)))
         print('No reboot performed. This remains an experimental image.')
     except Exception as exc:
@@ -328,10 +350,17 @@ def install(data, disk, source, provenance, restoring=False):
                f'{json.dumps(str(exc))}; verdict inconclusive. Backup directory {directory}; '
                'no automatic repair or reboot. Check the installed hash before any launch.\n')
         raise
+    finally:
+        if mounted_native:
+            try:
+                run('diskutil', 'unmount', disk)
+            except subprocess.CalledProcessError:
+                record(f'\nCleanup {exp_id}: native mount unmount FAILED; do not reboot before resolving it.\n')
+                raise
 
 
 def main():
-    global ESP_UUID, IMAGE_SHA256, SETUP_SOURCE, FIRMWARE_ONLY
+    global ESP_UUID, IMAGE_SHA256, SETUP_SOURCE, FIRMWARE_ONLY, NATIVE_MOUNT
     parser = argparse.ArgumentParser(description=__doc__, epilog=
         'Recreating the UEFI environment is a separate procedure: '
         'https://asahilinux.org/docs/platform/open-os-interop/ . '
@@ -343,6 +372,7 @@ def main():
     parser.add_argument('--image-sha256', help='explicit SHA256 of a rebuilt and recorded direct candidate')
     parser.add_argument('--setup-source', type=Path, help='complete ARM64 Setup media to stage after the bootstrap backup')
     parser.add_argument('--firmware-only', action='store_true', help='verify existing Setup and update firmware/provenance with a complete companion backup; no Windows recopy')
+    parser.add_argument('--native-mount', action='store_true', help='explicit FAT mount fallback for firmware-only updates or restore; never repair')
     args = parser.parse_args()
     if args.image_sha256:
         if not re.fullmatch('[0-9a-fA-F]{64}', args.image_sha256):
@@ -350,6 +380,9 @@ def main():
         IMAGE_SHA256 = args.image_sha256.lower()
     SETUP_SOURCE = args.setup_source
     FIRMWARE_ONLY = args.firmware_only
+    NATIVE_MOUNT = args.native_mount
+    if NATIVE_MOUNT and not (FIRMWARE_ONLY or args.restore):
+        raise ValueError('--native-mount is limited to firmware-only or restore')
     if FIRMWARE_ONLY and (SETUP_SOURCE is not None or args.restore is not None):
         raise ValueError('--firmware-only cannot be combined with --setup-source or --restore')
     if args.esp_uuid:
