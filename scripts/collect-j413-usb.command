@@ -8,10 +8,14 @@ if [ "$EUID" -eq 0 ]; then
     exit 2
 fi
 if [ "${1:-}" = --help ]; then
-    echo 'Authenticate locally, collect existing J413 USB evidence, save output in .local/usb-evidence.'
+    echo 'Default: collect existing J413 USB evidence. --install-diagnostics: install the manifested diagnostic WIM with backup.'
     exit 0
 fi
-if [ "$#" -ne 0 ]; then echo 'Usage: collect-j413-usb.command [--help]' >&2; exit 2; fi
+case "${1:-}" in
+    '') [ "$#" -eq 0 ] || exit 2; ARGS=(--collect-only) ;;
+    --install-diagnostics) [ "$#" -eq 1 ] || exit 2; ARGS=(--native-mount) ;;
+    *) echo 'Usage: collect-j413-usb.command [--install-diagnostics|--help]' >&2; exit 2 ;;
+esac
 OUT="$ROOT/.local/usb-evidence"
 if [ -L "$OUT" ]; then echo 'Evidence directory must not be a symlink.' >&2; exit 2; fi
 mkdir -p "$OUT"
@@ -20,7 +24,7 @@ chmod 700 "$OUT"
 sudo -v
 RUN=$(mktemp -d "$OUT/run.XXXXXX")
 set +e
-sudo -n /usr/bin/python3 "$ROOT/scripts/install-j413-winpe-diagnostics.py" --collect-only 2>&1 | tee "$RUN/console.log"
+sudo -n /usr/bin/python3 "$ROOT/scripts/install-j413-winpe-diagnostics.py" "${ARGS[@]}" 2>&1 | tee "$RUN/console.log"
 STATUS=${PIPESTATUS[0]}
 set -e
 /usr/bin/python3 - "$OUT" "$RUN" "$STATUS" <<'PY'

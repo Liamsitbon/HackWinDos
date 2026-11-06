@@ -1,0 +1,18 @@
+{
+  "recorded_utc": "2026-11-06T06:49:15.648133+00:00",
+  "collection_experiment": "EXP-20261106T064510Z-J413-WINPE-b09fce74",
+  "collector_exit_code": 0,
+  "console_sha256": "b52be1a3c226706a8dc0d0fbcf902edefefecd5c08c57e2d881a2c2360cb105b",
+  "console_path": ".local/usb-evidence/run.Dwr9sh/console.log",
+  "installed_bootstrap_sha256": "639d558d3e1abe42024df8edc298f12e283cc87906920851858a76e66db59cc9",
+  "observed_phase_statuses": {
+    "NVMe boot connection result": true,
+    "USB DART readiness protocol": true,
+    "USB boot connection result": true,
+    "Fixed-volume ARM64 selection result": true
+  },
+  "dart_controller_mask": 2,
+  "usb_child_or_mouse_enumeration_observed": false,
+  "windows_usb_handoff_or_dma_state_observed": false,
+  "qualification": "Privileged collection and caller-readable evidence handoff succeeded. UEFI reports successful controller connection/readiness; no USB child count or Windows PnP state in this phase log."
+}

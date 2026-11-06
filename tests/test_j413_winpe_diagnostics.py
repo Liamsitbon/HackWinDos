@@ -88,3 +88,14 @@ class WinpeDiagnosticTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'did not mount'):self.perform()
             self.assertEqual(raw.call_count,1)
         self.assertEqual((self.mount/'sources/boot.wim').read_bytes(),self.old)
+
+    def test_explicit_native_mount_is_exact_target_and_never_repairs(self):
+        native=self.root/'native';native.mkdir()
+        with patch.object(install.base,'find_esp',return_value='disk9s4'), \
+             patch.object(Path,'is_mount',return_value=True):
+            self.assertEqual(install.native_mount('disk9s4',native),native/'esp')
+        self.assertEqual(self.mount_command.call_args.args[0],
+                         ['/sbin/mount_msdos','-o','rw,nobrowse,noexec','/dev/disk9s4',str(native/'esp')])
+        with patch.object(install.base,'find_esp',return_value='disk9s5'):
+            with self.assertRaisesRegex(ValueError,'identity changed'):
+                install.native_mount('disk9s4',self.root)

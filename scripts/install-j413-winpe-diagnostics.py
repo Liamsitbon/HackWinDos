@@ -23,6 +23,7 @@ spec.loader.exec_module(base)
 BACKUPS = ROOT/'.local/winpe-diagnostic-installs'
 MARKER = 'J413Setup/DIAGNOSTIC-TARGET-'+profile.ESP_UUID+'.txt'
 FILES = ('sources/boot.wim', 'J413Setup/MEDIA.json', 'J413Setup/WINPE-DIAGNOSTICS.json', MARKER)
+NATIVE_MOUNT = False
 
 
 def json_bytes(data):
@@ -133,6 +134,21 @@ def collect_without_mount(disk, info, directory):
     print(raw.split(b'\0',1)[0].decode('ascii','replace'))
 
 
+def native_mount(disk, directory):
+    if base.find_esp() != disk:
+        raise ValueError('Native mount target identity changed')
+    target = directory/'esp'
+    target.mkdir(mode=0o700)
+    result = subprocess.run(['/sbin/mount_msdos','-o','rw,nobrowse,noexec',
+                             '/dev/'+disk,str(target)],capture_output=True)
+    output = result.stdout+result.stderr
+    (directory/'native-mount.txt').write_bytes(output)
+    if result.returncode != 0 or not target.is_mount():
+        print(output.decode(errors='replace'))
+        raise ValueError('Native FAT mount failed; no repair or media replacement attempted')
+    return target
+
+
 def operate(disk, diagnostic, restore=None, collect_only=False):
     stamp = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')
     exp = 'EXP-'+stamp+'-J413-WINPE-'+uuid.uuid4().hex[:8]
@@ -148,6 +164,7 @@ def operate(disk, diagnostic, restore=None, collect_only=False):
                 '. No firmware replacement, driver load, partition/format/repair, security change or reboot.\n')
     recovery_path = None
     mounted_read_only = False
+    mounted_native = False
     try:
         was_mounted = bool(base.disk_info(disk).get('MountPoint'))
         mount_command = ['diskutil','mount'] + (['readOnly'] if collect_only else []) + [disk]
@@ -157,6 +174,9 @@ def operate(disk, diagnostic, restore=None, collect_only=False):
         if info.get('DiskUUID','').upper() != profile.ESP_UUID:
             raise ValueError('ESP changed after mount')
         mountpoint = info.get('MountPoint')
+        if not mountpoint and not collect_only and NATIVE_MOUNT:
+            mountpoint = str(native_mount(disk,directory))
+            mounted_native = True
         if not mountpoint:
             if collect_only:
                 collect_without_mount(disk,info,directory)
@@ -204,7 +224,10 @@ def operate(disk, diagnostic, restore=None, collect_only=False):
         print('Evidence: '+str(directory))
         if recovery_path:
             print('Rollback: sudo /usr/bin/python3 '+shlex.quote(str(Path(__file__).resolve()))+
+                  (' --native-mount' if NATIVE_MOUNT else '')+
                   ' --restore '+shlex.quote(str(recovery_path)))
+            if not restore:
+                print('Diagnostic WIM installed and verified. Firmware remains unchanged.')
         print('No reboot performed.')
     except Exception as error:
         if recovery_path is not None:
@@ -218,19 +241,27 @@ def operate(disk, diagnostic, restore=None, collect_only=False):
                     '; no physical diagnostic result or reboot. Evidence '+str(directory)+'.\n')
         raise
     finally:
-        if mounted_read_only:
+        if mounted_read_only or mounted_native:
             result = subprocess.run(['diskutil','unmount',disk],capture_output=True)
             (directory/'unmount.txt').write_bytes(result.stdout+result.stderr)
+            if result.returncode != 0:
+                base.record('\nCleanup '+exp+': unmount failed; see unmount.txt.\n')
+                raise ValueError('Unmount did not complete; see '+str(directory/'unmount.txt'))
 
 
 def main():
+    global NATIVE_MOUNT
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--dry-run',action='store_true')
     parser.add_argument('--collect-only',action='store_true',help='read the existing UEFI log without changing Setup media')
     parser.add_argument('--restore',type=Path)
+    parser.add_argument('--native-mount',action='store_true',help='allow the macOS FAT mount helper if Disk Arbitration fails; never repair')
     args=parser.parse_args()
     if args.restore and args.collect_only:
         raise ValueError('Choose collect-only or restore')
+    NATIVE_MOUNT = args.native_mount
+    if NATIVE_MOUNT and args.collect_only:
+        raise ValueError('Native write mount is not used for collection')
     diagnostic = {} if args.restore or args.collect_only else profile.verify()
     if args.restore:
         recovery_files(args.restore)
