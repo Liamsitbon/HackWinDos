@@ -1,0 +1,14 @@
+{
+  "recorded_utc": "2026-11-06T06:58:30.142000+00:00",
+  "experiment": "EXP-20261106T065636Z-J413-WINPE-518bd56b",
+  "parent_experiment": "EXP-20261106-J413-060",
+  "diagnostic_wim_sha256": "965e81d96c8b3586dca213fdfe9cbf0dea7b16afd9ceb6186c6cd40f2e735dd0",
+  "firmware_sha256_unchanged": "639d558d3e1abe42024df8edc298f12e283cc87906920851858a76e66db59cc9",
+  "console_sha256": "d9d259fd07364585e408c5287a2f52350bb04889552b155213c91a233a3cc8fa",
+  "console_path": ".local/usb-evidence/run.nxwn72/console.log",
+  "installed_and_verified": true,
+  "launcher_exit_code": 0,
+  "recovery_record": ".local/winpe-diagnostic-installs/EXP-20261106T065636Z-J413-WINPE-518bd56b/RECOVERY.json",
+  "native_diagnostic_boot_observed": false,
+  "qualification": "Owner installation completed with verified backups and caller-readable output; Windows-side diagnostic execution remains pending."
+}

@@ -1,0 +1,85 @@
+{
+  "recorded_utc": "2026-11-06T07:20:55.270740+00:00",
+  "experiment": "EXP-20261106-J413-061",
+  "manifest": {
+    "profile": "winpe-diagnostic",
+    "platform": "j413",
+    "created_utc": "2026-11-06T07:19:11.836147+00:00",
+    "source_boot_wim_sha256": "dcf58a3d6be5d8747ba8b475f6bbc3782a53bc5dc14c7b11e73ff140deeab534",
+    "firmware_sha256": "639d558d3e1abe42024df8edc298f12e283cc87906920851858a76e66db59cc9",
+    "esp_uuid": "6E5BC1A2-9871-4E5A-8E60-BF68C8E785BB",
+    "source_sha256": {
+      "tools/winpe/J413Collect.cmd": "e366f69af1d8b63cde42e68f8ab17cee0b7e827a69c2c3d5390d62ee75fba2fa",
+      "tools/winpe/j413-wait.c": "d9a85ef61de8d8d9bd54c4ef5b8405ce3c9cf682fa8db950a3aa9853836cbc9c",
+      "tools/winpe/j413-report.c": "6564408855fa9f15945f875b6729395e79da446ad013e8a55f04c8e825705593",
+      "tools/winpe/report-pages.h": "527fc9449992255b41d13f576cdd9779075c7e25bcddd368dd6361c70b701204",
+      "tools/j413_winpe_diagnostics.py": "12b74e79b4888a4f62e8a6aa7c7a0d886c68dc9268d7be313e1586568a57a200"
+    },
+    "images": [
+      {
+        "index": "1",
+        "name": "Microsoft Windows PE (arm64)",
+        "architecture": "ARM64"
+      },
+      {
+        "index": "2",
+        "name": "Microsoft Windows Setup (arm64)",
+        "architecture": "ARM64"
+      }
+    ],
+    "native_execution_qualified": false,
+    "behavior": "Read-only inventory with automatic USB/problem/HID/disk display pages; original Setup launch retained",
+    "artifacts": {
+      "boot.wim": {
+        "sha256": "3a85e0a54facf56fa08750b173dd3191da06bc54a396233b1b26aeff642e8500",
+        "size": 636628125
+      },
+      "J413Wait.exe": {
+        "sha256": "478d36438d19905810d84df88e2cd1304627351662d45e9e72aa83efe75b8b34",
+        "size": 2048
+      },
+      "J413Report.exe": {
+        "sha256": "1426829f46848fe097b62bafc9d197a24b4b32fd370099434ccd3c7ecc2acb17",
+        "size": 6656
+      },
+      "J413Collect.cmd": {
+        "sha256": "8d8c81415fb8feb42d04721ce404a886702ba971a587a88eb24dbcb8d9073cc1",
+        "size": 3498
+      },
+      "winpeshl.ini": {
+        "sha256": "c317c1885262a309f6c16b645a207640f806d1cb9a79c0a0e4461e13844e2fcb",
+        "size": 191
+      }
+    }
+  },
+  "report_pe_imports": [
+    {
+      "dll": "KERNEL32.dll",
+      "functions": [
+        "CloseHandle",
+        "CreateFileW",
+        "ExitProcess",
+        "GetConsoleScreenBufferInfo",
+        "GetEnvironmentVariableW",
+        "GetStdHandle",
+        "MultiByteToWideChar",
+        "ReadFile",
+        "Sleep",
+        "WriteConsoleOutputW"
+      ]
+    }
+  ],
+  "software_verification": [
+    "ARM64 PE32+ console helpers",
+    "embedded WIM file bytes match",
+    "full WIM integrity",
+    "both source images ARM64",
+    "ASan/UBSan C page-layout regression",
+    "eight installer backup/rollback/identity tests",
+    "change ledger schema"
+  ],
+  "installed": false,
+  "native_display_qualified": false,
+  "recovery": ".local/winpe-diagnostics/recovery-exp060-965e81d9",
+  "qualification": "Presentation update only; no USB/input repair or hardware validation claimed."
+}

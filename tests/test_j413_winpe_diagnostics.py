@@ -68,6 +68,35 @@ class WinpeDiagnosticTests(unittest.TestCase):
         self.assertEqual(json.loads((self.mount/'J413Setup/MEDIA.json').read_text()),self.metadata)
         self.assertFalse(list(self.mount.rglob('.j413-wim-*')))
 
+    def previous_diagnostic(self):
+        previous = {'profile': 'winpe-diagnostic', 'esp_uuid': install.profile.ESP_UUID,
+                    'firmware_sha256': install.profile.BOOTSTRAP_SHA256,
+                    'source_boot_wim_sha256': install.profile.SOURCE_SHA256,
+                    'artifacts': {'boot.wim': self.metadata['files']['sources/boot.wim']}}
+        self.metadata['winpe_diagnostics'] = previous
+        (self.mount/'J413Setup/MEDIA.json').write_text(json.dumps(self.metadata))
+        (self.mount/'J413Setup/WINPE-DIAGNOSTICS.json').write_text(json.dumps(previous))
+        return previous
+
+    def test_pinned_diagnostic_upgrade_and_rollback_preserve_prior_manifest(self):
+        self.previous_diagnostic()
+        old_manifest = (self.mount/'J413Setup/WINPE-DIAGNOSTICS.json').read_bytes()
+        with patch.object(install.profile, 'PREVIOUS_DIAGNOSTIC_SHA256', install.profile.SOURCE_SHA256):
+            self.perform()
+        record = next(install.BACKUPS.glob('*/RECOVERY.json'))
+        install.restore_files(self.mount, record)
+        self.assertEqual((self.mount/'sources/boot.wim').read_bytes(), self.old)
+        self.assertEqual((self.mount/'J413Setup/WINPE-DIAGNOSTICS.json').read_bytes(), old_manifest)
+
+    def test_pinned_diagnostic_with_mismatched_metadata_is_rejected_before_backup(self):
+        previous = self.previous_diagnostic()
+        previous['esp_uuid'] = 'WRONG-TARGET'
+        (self.mount/'J413Setup/WINPE-DIAGNOSTICS.json').write_text(json.dumps(previous))
+        with patch.object(install.profile, 'PREVIOUS_DIAGNOSTIC_SHA256', install.profile.SOURCE_SHA256):
+            with self.assertRaisesRegex(ValueError, 'identity/metadata mismatch'): self.perform()
+        self.assertEqual((self.mount/'sources/boot.wim').read_bytes(), self.old)
+        self.assertFalse(list(install.BACKUPS.glob('*/RECOVERY.json')))
+
     def test_corrupt_backup_refuses_restore_before_any_mutation(self):
         self.perform();record=next(install.BACKUPS.glob('*/RECOVERY.json'))
         (record.parent/'payload-0.before').write_bytes(b'corrupt backup')

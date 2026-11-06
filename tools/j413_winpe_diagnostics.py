@@ -17,6 +17,8 @@ OUT = ROOT/'dist/j413-winpe-diagnostics'
 SOURCE_SHA256 = 'dcf58a3d6be5d8747ba8b475f6bbc3782a53bc5dc14c7b11e73ff140deeab534'
 BOOTSTRAP_SHA256 = '639d558d3e1abe42024df8edc298f12e283cc87906920851858a76e66db59cc9'
 ESP_UUID = '6E5BC1A2-9871-4E5A-8E60-BF68C8E785BB'
+PREVIOUS_DIAGNOSTIC_SHA256 = '965e81d96c8b3586dca213fdfe9cbf0dea7b16afd9ceb6186c6cd40f2e735dd0'
+ARTIFACTS = ('boot.wim', 'J413Wait.exe', 'J413Report.exe', 'J413Collect.cmd', 'winpeshl.ini')
 LAUNCHER = ('[LaunchApps]\r\n'
  '%SYSTEMROOT%\\System32\\cmd.exe, /d /c start "J413 collector" /min "%SYSTEMROOT%\\System32\\cmd.exe" /d /c "%SYSTEMROOT%\\System32\\J413Collect.cmd"\r\n'
  '%SYSTEMDRIVE%\\sources\\setup.exe\r\n').encode('ascii')
@@ -36,7 +38,8 @@ def command(*args):
 
 def sources():
     return {str(p.relative_to(ROOT)): sha(p) for p in
-            [ROOT/'tools/winpe/J413Collect.cmd', ROOT/'tools/winpe/j413-wait.c', Path(__file__)]}
+            [ROOT/'tools/winpe/J413Collect.cmd', ROOT/'tools/winpe/j413-wait.c',
+             ROOT/'tools/winpe/j413-report.c', ROOT/'tools/winpe/report-pages.h', Path(__file__)]}
 
 
 def verify(directory=OUT):
@@ -47,12 +50,12 @@ def verify(directory=OUT):
             data.get('source_sha256') != sources()):
         raise ValueError('Diagnostic profile or source identity changed; rebuild')
     for name, record in data['artifacts'].items():
-        if name not in ('boot.wim', 'J413Wait.exe', 'J413Collect.cmd', 'winpeshl.ini'):
+        if name not in ARTIFACTS:
             raise ValueError('Unexpected diagnostic artifact')
         path = directory/name
         if path.stat().st_size != record['size'] or sha(path) != record['sha256']:
             raise ValueError('Diagnostic artifact changed: '+name)
-    if set(data['artifacts']) != {'boot.wim', 'J413Wait.exe', 'J413Collect.cmd', 'winpeshl.ini'}:
+    if set(data['artifacts']) != set(ARTIFACTS):
         raise ValueError('Incomplete diagnostic artifacts')
     return data
 
@@ -81,18 +84,27 @@ def build(source):
                 '-c', ROOT/'tools/winpe/j413-wait.c', '-o', directory/'wait.obj')
         command('lld-link', '/machine:arm64', '/entry:Entry', '/subsystem:console', '/nodefaultlib',
                 '/out:'+str(directory/'J413Wait.exe'), directory/'wait.obj', directory/'kernel32.lib')
-        pe = (directory/'J413Wait.exe').read_bytes()
-        offset = struct.unpack_from('<I', pe, 60)[0]
-        if (pe[offset:offset+4] != b'PE\0\0' or struct.unpack_from('<H', pe, offset+4)[0] != 0xaa64 or
-                struct.unpack_from('<H', pe, offset+24)[0] != 0x20b or
-                struct.unpack_from('<H', pe, offset+24+68)[0] != 3):
-            raise ValueError('Wait helper is not an ARM64 PE32+ console application')
+        definition.write_text('LIBRARY KERNEL32.dll\nEXPORTS\nGetStdHandle\nGetConsoleScreenBufferInfo\n'
+                              'WriteConsoleOutputW\nGetEnvironmentVariableW\nCreateFileW\nReadFile\n'
+                              'CloseHandle\nMultiByteToWideChar\nSleep\nExitProcess\n')
+        command('lld-link', '/lib', '/machine:arm64', '/def:'+str(definition), '/out:'+str(directory/'kernel32.lib'))
+        command('clang', '--target=aarch64-pc-windows-msvc', '-ffreestanding', '-fno-stack-protector',
+                '-Wall', '-Wextra', '-Werror', '-c', ROOT/'tools/winpe/j413-report.c', '-o', directory/'report.obj')
+        command('lld-link', '/machine:arm64', '/entry:Entry', '/subsystem:console', '/nodefaultlib',
+                '/out:'+str(directory/'J413Report.exe'), directory/'report.obj', directory/'kernel32.lib')
+        for helper in ('J413Wait.exe', 'J413Report.exe'):
+            pe = (directory/helper).read_bytes()
+            offset = struct.unpack_from('<I', pe, 60)[0]
+            if (pe[offset:offset+4] != b'PE\0\0' or struct.unpack_from('<H', pe, offset+4)[0] != 0xaa64 or
+                    struct.unpack_from('<H', pe, offset+24)[0] != 0x20b or
+                    struct.unpack_from('<H', pe, offset+24+68)[0] != 3):
+                raise ValueError(helper+' is not an ARM64 PE32+ console application')
         collector = (ROOT/'tools/winpe/J413Collect.cmd').read_text().replace('\r\n','\n').replace('\n','\r\n').encode('ascii')
         (directory/'J413Collect.cmd').write_bytes(collector)
         (directory/'winpeshl.ini').write_bytes(LAUNCHER)
         shutil.copyfile(source, directory/'boot.wim')
         # wimlib receives an argv, not shell text. Its own command grammar quotes paths.
-        for name in ('J413Wait.exe', 'J413Collect.cmd', 'winpeshl.ini'):
+        for name in ARTIFACTS[1:]:
             local = str(directory/name)
             if '"' in local or '\n' in local:
                 raise ValueError('Unsupported WIM staging path')
@@ -109,9 +121,9 @@ def build(source):
                 'source_boot_wim_sha256':SOURCE_SHA256,'firmware_sha256':BOOTSTRAP_SHA256,
                 'esp_uuid':ESP_UUID,'source_sha256':sources(),'images':arm64_images(directory/'boot.wim'),
                 'native_execution_qualified':False,
-                'behavior':'Background read-only inventory and existing log collection; original Setup launch retained',
+                'behavior':'Read-only inventory with automatic USB/problem/HID/disk display pages; original Setup launch retained',
                 'artifacts':{name:{'sha256':sha(directory/name),'size':(directory/name).stat().st_size}
-                             for name in ('boot.wim','J413Wait.exe','J413Collect.cmd','winpeshl.ini')}}
+                             for name in ARTIFACTS}}
         if OUT.exists():
             raise ValueError('Output already exists; preserve it explicitly before rebuilding')
         OUT.mkdir()

@@ -1,0 +1,41 @@
+{
+  "recorded_utc": "2026-11-06T07:15:37.308868+00:00",
+  "experiment": "EXP-20261106-J413-060",
+  "installed_transaction": "EXP-20261106T065636Z-J413-WINPE-518bd56b",
+  "photos": [
+    {
+      "file": "IMG_6341.HEIC",
+      "sha256": "9d5c6383bb26e9a1f9fdd341a70894300ce29d182b438e4ae522518e96b937c0"
+    },
+    {
+      "file": "IMG_6343.HEIC",
+      "sha256": "02f0cffff47d5ba929d17796e4422ee732d48a0f8347ea242e3e3f37e7dd5166"
+    },
+    {
+      "file": "IMG_6344.HEIC",
+      "sha256": "2cd54838464cfeaf5e0b527f1cebbe4712c4657488066cc363b538f6f3fe7fd4"
+    }
+  ],
+  "observed": {
+    "diagnostic_summary_opened": true,
+    "diskpart_disk0": "Online; 233 GB; GPT; 100 MB free",
+    "volume0": "EFI - HACKW; FAT32; Partition; 8 GB; Healthy; Hidden; no drive letter",
+    "standard_nvm_express_controller": "Started; stornvme.inf; service stornvme",
+    "marker_matches": 0,
+    "media_volume": "",
+    "visible_installer_paths": [],
+    "usb_section": "heading visible at bottom; device contents outside photographed viewport"
+  },
+  "operator_report": {
+    "hub_with_usb_media": "connected to port user calls usb0",
+    "setup": "reached installer without earlier media-driver prompt",
+    "input": "external mouse, built-in trackpad and keyboard unresponsive; could not scroll"
+  },
+  "limits": [
+    "Port identity not measured from ADT in this run.",
+    "Photograph shows powered adapter LED, not proof of USB enumeration or mouse VBUS.",
+    "No measured elapsed times, stop code, CPU/IRQ/timer, SSH/RDP or USB descriptor state.",
+    "Absence of driver prompt is an operator observation, not proof that install.swm can be read."
+  ],
+  "verdict": "Native diagnostic launch and internal storage enumeration confirmed; USB/input cause inconclusive."
+}

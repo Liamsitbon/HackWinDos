@@ -13,6 +13,11 @@ pnputil /enum-devices /class SCSIAdapter /drivers /services >"%LOG%\STORAGE-PNP.
 pnputil /enum-devices /class USB /drivers /services >"%LOG%\USB-PNP.txt" 2>&1
 pnputil /enum-devices /class HIDClass /drivers /services >"%LOG%\HID-PNP.txt" 2>&1
 pnputil /enum-devices /problem >"%LOG%\PROBLEM-PNP.txt" 2>&1
+rem Compact display copies retain status, instance ID and any problem code.
+rem Do not bury USB evidence behind matching driver/rank listings.
+pnputil /enum-devices /class USB >"%LOG%\USB-COMPACT.txt" 2>&1
+pnputil /enum-devices /class HIDClass >"%LOG%\HID-COMPACT.txt" 2>&1
+copy /y "%LOG%\PROBLEM-PNP.txt" "%LOG%\PROBLEM-COMPACT.txt" >nul 2>&1
 reg query HKLM\SYSTEM\CurrentControlSet\Enum\PCI /s >"%LOG%\PCI-REG.txt" 2>&1
 reg query HKLM\SYSTEM\CurrentControlSet\Enum\USB /s >"%LOG%\USB-REG.txt" 2>&1
 reg query HKLM\SYSTEM\CurrentControlSet\Services\stornvme /s >"%LOG%\NVME-SERVICE.txt" 2>&1
@@ -30,7 +35,7 @@ copy /y "%SystemRoot%\System32\wpeinit.log" "%LOG%\wpeinit.log" >nul 2>&1
 >>"%LOG%\SUMMARY.txt" echo Firmware unchanged. No driver loaded or Windows installation applied.
 >>"%LOG%\SUMMARY.txt" echo Exact target marker matches: %MATCHES%
 >>"%LOG%\SUMMARY.txt" echo Media volume: %MEDIA%
->>"%LOG%\SUMMARY.txt" echo Photograph this window. Scroll for more details if external input works.
+>>"%LOG%\SUMMARY.txt" echo The separate input report automatically pages USB, problems, HID and disks.
 type "%LOG%\MEDIA.txt" >>"%LOG%\SUMMARY.txt"
 type "%LOG%\DISKS.txt" >>"%LOG%\SUMMARY.txt"
 >>"%LOG%\SUMMARY.txt" echo STORAGE CONTROLLERS:
@@ -40,7 +45,8 @@ type "%LOG%\USB-PNP.txt" >>"%LOG%\SUMMARY.txt"
 >>"%LOG%\SUMMARY.txt" echo DEVICES REPORTING PROBLEMS:
 type "%LOG%\PROBLEM-PNP.txt" >>"%LOG%\SUMMARY.txt"
 if defined MEDIA call :persist
-start "J413 WinPE diagnostics" "%SystemRoot%\System32\notepad.exe" "%LOG%\SUMMARY.txt"
+start "J413 input report" "%SystemRoot%\System32\J413Report.exe"
+if errorlevel 1 start "J413 WinPE diagnostics" "%SystemRoot%\System32\notepad.exe" "%LOG%\SUMMARY.txt"
 exit /b
 
 :volume

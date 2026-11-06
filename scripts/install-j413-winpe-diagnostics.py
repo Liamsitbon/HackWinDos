@@ -198,8 +198,21 @@ def operate(disk, diagnostic, restore=None, collect_only=False):
                 recovery_files(restore)
             else:
                 base.verify_same_volume(mount)
-                if profile.sha(mount/'sources/boot.wim') != profile.SOURCE_SHA256:
-                    raise ValueError('Expected original Setup WIM; restore an earlier diagnostic update first')
+                installed_sha = profile.sha(mount/'sources/boot.wim')
+                if installed_sha == profile.PREVIOUS_DIAGNOSTIC_SHA256:
+                    # The photographed first diagnostic is a permitted upgrade
+                    # source, only with its matching on-volume manifest.
+                    previous = json.loads((mount/'J413Setup/WINPE-DIAGNOSTICS.json').read_text())
+                    media = json.loads((mount/'J413Setup/MEDIA.json').read_text())
+                    if (previous.get('profile') != 'winpe-diagnostic' or
+                            previous.get('esp_uuid') != profile.ESP_UUID or
+                            previous.get('firmware_sha256') != profile.BOOTSTRAP_SHA256 or
+                            previous.get('source_boot_wim_sha256') != profile.SOURCE_SHA256 or
+                            previous.get('artifacts', {}).get('boot.wim', {}).get('sha256') != installed_sha or
+                            media.get('winpe_diagnostics') != previous):
+                        raise ValueError('Previous diagnostic identity/metadata mismatch')
+                elif installed_sha != profile.SOURCE_SHA256:
+                    raise ValueError('Expected original or explicitly pinned previous diagnostic WIM')
                 if os.statvfs(mount).f_bavail*os.statvfs(mount).f_frsize < diagnostic['artifacts']['boot.wim']['size']+16*1024*1024:
                     raise ValueError('Not enough ESP space for an atomic WIM replacement')
             entries = snapshot(mount, directory)
