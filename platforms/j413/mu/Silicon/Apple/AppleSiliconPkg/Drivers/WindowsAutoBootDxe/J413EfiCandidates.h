@@ -5,8 +5,8 @@
 #define J413_EFI_MAX_PATH 1024
 #define J413_EFI_MAX_CANDIDATES 256
 
-STATIC BOOLEAN mEfiScanned;
 #ifndef J413_DIRECT_SETUP_ONLY
+STATIC BOOLEAN mEfiScanned;
 typedef struct J413_EFI_CANDIDATE {
   struct J413_EFI_CANDIDATE *Next;
   EFI_HANDLE Handle;
@@ -157,6 +157,11 @@ STATIC EFI_STATUS J413NextEfiOption(EFI_BOOT_MANAGER_LOAD_OPTION *Option) {
       EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *Fs = NULL;
       EFI_FILE_PROTOCOL *Root = NULL;
       CHAR16 Path[J413_EFI_MAX_PATH] = L"\\EFI\\BOOT\\BOOTAA64.EFI";
+#ifdef J413_USB_BOOT_ONLY
+      EFI_DEVICE_PATH_PROTOCOL *Remaining = DevicePathFromHandle(Handles[Index]);
+      EFI_HANDLE Usb = NULL;
+      if (Remaining == NULL || EFI_ERROR(gBS->LocateDevicePath(&gEfiUsbIoProtocolGuid, &Remaining, &Usb))) continue;
+#endif
       Status = gBS->HandleProtocol(Handles[Index], &gEfiSimpleFileSystemProtocolGuid, (VOID **)&Fs);
       if (EFI_ERROR(Status) || Fs == NULL) continue;
       Status = Fs->OpenVolume(Fs, &Root);

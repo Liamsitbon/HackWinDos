@@ -214,3 +214,26 @@ Windows WIM and install files remain untouched. Recovery ce99784c lives at
 .local/recovery-20261106-before-nvme-inner; earlier 639d558d recovery remains.
 Plan and current result: investigation/analysis/2026-11-06-nvme-inner-plan.md and
 2026-11-06-nvme-inner-build-result.json. No native run of EXP066 is claimed.
+
+
+## EXP067: corrected failed-Start status (current candidate)
+
+Code review and an actual-C failure regression found that NVMe DriverBindingStart
+replaced its original error with the cleanup return value. Successful cleanup
+could therefore make failed controller initialization return EFI_SUCCESS. The
+J413 correction preserves the original error through the existing cleanup and
+returns/logs it accurately. Existing successful initialization and cleanup calls
+are unchanged; no new register, DMA, IRQ, timeout or Windows change.
+
+Install with `bash scripts/install-j413-nvme-fix.command`. The older console
+launcher forwards to this same current candidate. Bootstrap SHA256:
+`bf8d4a1433f784740a68be82c564e04015a81bc8fa9cba8e9db4568927aa94b5`. Firmware-only installation
+backs up all companions and preserves Windows media. Previous d2c2f465 profile
+is at .local/recovery-20261106-before-nvme-start-fix; earlier recovery remains.
+
+The defect is reproduced and fixed in source, the full build passed, and 22
+focused regressions passed. Its relationship to the photographed hang is not
+proven: a corrected error return cannot preempt an operation that never returns.
+Native qualification still requires the next owner run. Plan and evidence are
+in investigation/analysis/2026-11-06-nvme-start-fix-plan.md and
+2026-11-06-nvme-start-fix-build-result.json.

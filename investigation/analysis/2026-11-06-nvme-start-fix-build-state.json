@@ -1,0 +1,18 @@
+{
+  "root": {
+    "commit": "5cc8d977f6ab85a81014fe7d219ff681d800f45b",
+    "diff_sha256": "ae9df3a12b54a257bdcbbca3f4d3e381d03f3a72553d3e80b63d54d7ce9b7948"
+  },
+  "m1n1": {
+    "commit": "9cd80ac652ac404e92ae279deeaec8c629d7d184",
+    "diff_sha256": "c21fa5b54fdd085ed09614abdef38fc86697c9a5efc13949a420c9928b8ee6a8"
+  },
+  "Mu": {
+    "commit": "8b4dc4b4e3ff8606d0af36163acf9de79b7b4737",
+    "diff_sha256": "cdaa87f776c3bc87aef715fd264af3b25b88c0033bfaa24352671445feaff414"
+  },
+  "MuBaseCore": {
+    "commit": "dcb182ecc8a20aaf191cfe97fabd31e21e02af01",
+    "diff_sha256": "67d62b97166cac54698e38a5b0ad177908fea42b49ea947a99f602dd1a0dcf8d"
+  }
+}

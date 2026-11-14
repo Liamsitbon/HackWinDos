@@ -4,6 +4,8 @@
 #define J413_DIRECT_SETUP_H
 #include "J413SetupPartition.h"
 
+STATIC BOOLEAN mDirectSetupTried;
+
 STATIC EFI_STATUS J413DirectSetupOption(EFI_BOOT_MANAGER_LOAD_OPTION *Option, CONST EFI_GUID *Target)
 {
   EFI_HANDLE Selected = NULL;
@@ -18,8 +20,8 @@ STATIC EFI_STATUS J413DirectSetupOption(EFI_BOOT_MANAGER_LOAD_OPTION *Option, CO
     Print(L"UEFI DIRECT: target partition UUID is not configured\r\n");
     return EFI_NOT_READY;
   }
-  if (mEfiScanned) return EFI_NOT_FOUND;
-  mEfiScanned = TRUE;
+  if (mDirectSetupTried) return EFI_NOT_FOUND;
+  mDirectSetupTried = TRUE;
   Status = J413FindSetupPartition(Target, &Selected);
   if (EFI_ERROR(Status)) return Status;
   Status = gBS->HandleProtocol(Selected, &gEfiSimpleFileSystemProtocolGuid, (VOID **)&Fs);

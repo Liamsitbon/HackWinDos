@@ -1,0 +1,33 @@
+--- a/MU_BASECORE/MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpress.c
++++ b/MU_BASECORE/MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpress.c
+@@ -1115,6 +1115,9 @@
+   )
+ {
+   EFI_STATUS                    Status;
++#ifdef J413_BOOT_CONTRACT
++  EFI_STATUS                    SavedStartStatus;
++#endif
+   EFI_PCI_IO_PROTOCOL           *PciIo;
+   NVME_CONTROLLER_PRIVATE_DATA  *Private;
+   EFI_DEVICE_PATH_PROTOCOL      *ParentDevicePath;
+@@ -1422,6 +1425,10 @@
+   return EFI_SUCCESS;
+ 
+ Exit:
++#ifdef J413_BOOT_CONTRACT
++  // Cleanup success must not turn a failed controller start into EFI_SUCCESS.
++  SavedStartStatus = Status;
++#endif
+   // MU_CHANGE [BEGIN] - Allocate IO Queue Buffer
+   // if ((Private != NULL) && (Private->Mapping != NULL)) {
+   //   PciIo->Unmap (PciIo, Private->Mapping);
+@@ -1470,6 +1477,9 @@
+          Controller
+          );
+ 
++#ifdef J413_BOOT_CONTRACT
++  Status = SavedStartStatus;
++#endif
+   DEBUG ((DEBUG_INFO, "NvmExpressDriverBindingStart: end with %r\n", Status));
+ 
+   return Status;

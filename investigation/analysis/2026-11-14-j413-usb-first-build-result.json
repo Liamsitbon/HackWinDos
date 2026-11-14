@@ -1,0 +1,19 @@
+{
+  "recorded_utc": "2026-11-14T20:05:08.323663+00:00",
+  "experiment": "EXP-20261114-J413-068",
+  "firmware_implementation_commit": "d939a7c2dc518d30663fd6ac50a287898653c713",
+  "installer_commit": "b1b87ad85498429bc862b3ce7c1b38af0c13d739",
+  "bootstrap_sha256": "3ed26369b22873d94fa663a83d1d643cc318ad4ac178fe052c22cb9592fbb12d",
+  "fd_sha256": "c2cceac82c75553f476da66083f3c9d6f3c308b26ed277e7615f12e4a4887e35",
+  "WindowsAutoBootDxe_arm64_sha256": "d3730a1852a007a34926440e660a4595cb8d58c42356839368725fdbec0cff89",
+  "manifest": "dist/j413/boot-experiment/MANIFEST.json",
+  "launcher": "scripts/install-j413-usb-first.command",
+  "launcher_sha256": "2529e03c32e232ffcc0aad107c8f80212eae4f3f911b23fa7899bc9c6dc10364",
+  "focused_suite": {
+    "passed": 115,
+    "skipped": 1
+  },
+  "target": "disk0s4 (6E5BC1A2-9871-4E5A-8E60-BF68C8E785BB)",
+  "hardware_status": "not installed or booted",
+  "recovery": ".local/recovery-20261114-before-usb-first"
+}

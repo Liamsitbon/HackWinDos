@@ -1,0 +1,31 @@
+{
+  "recorded_utc": "2026-11-06T09:22:10.987563+00:00",
+  "experiment": "EXP-20261106-J413-067",
+  "confirmed_defect": "Failed DriverBindingStart status was overwritten by cleanup success or a different cleanup error.",
+  "fix": "Save original J413 Start error on entry to existing cleanup and restore it before final log/return.",
+  "source_file": "MU_BASECORE/MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpress.c",
+  "compiled_source_sha256": "55b140be2e96549648d468797d713348273c5dc792862bd2f482999faab58da8",
+  "boot": {
+    "role": "standalone-bootstrap",
+    "sha256": "bf8d4a1433f784740a68be82c564e04015a81bc8fa9cba8e9db4568927aa94b5",
+    "size": 2541884
+  },
+  "firmware": {
+    "role": "guest-firmware",
+    "sha256": "9f1488107ca2934c60747fe7ab6f985dba89dbf9fc52c777b97e1302bbb523ad",
+    "size": 30965760
+  },
+  "manifest": "dist/j413/boot-experiment/MANIFEST.json",
+  "profile": "debug/physical/off; both no-proxy stages",
+  "nvme_efi_machine": "ARM64",
+  "nvme_efi_sha256": "7c2fe3790bcc2771d4c0b8894e94bd3b2d3ae740d2d91e8693f3347735645a2d",
+  "software_tests": 22,
+  "regression_before": ".local/nvme-start-fix/error-before.log",
+  "regression_after": ".local/nvme-start-fix/error-after.log",
+  "regression_method": "Compile and execute the real source error-exit block under ASan/UBSan with injected cleanup success/failure/null allocation; verify resource-release counts and unchanged non-J413 result.",
+  "recovery": ".local/recovery-20261106-before-nvme-start-fix",
+  "installed": false,
+  "hardware_cause_confirmed": false,
+  "native_qualified": false,
+  "qualification": "Confirmed software correction; connection to photographed stall and native boot remain unproven."
+}
